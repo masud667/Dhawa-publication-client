@@ -1,54 +1,110 @@
-import React, { useEffect, useState } from 'react'
-import Banner from './Banner'
-import { RecentBooks } from './RecentBooks/RecentBooks'
+import React, { useState, useEffect } from 'react';
+import { RecentBooks } from './RecentBooks/RecentBooks';
+import { BookSection } from './BookSection';
 
-function Home() {
-  // Recent books state
+const Home = () => {
+  // ─── State for all sections ────────────────────────────────
   const [recentBooks, setRecentBooks] = useState([]);
+  const [popularBooks, setPopularBooks] = useState([]);
+  const [muslimLifeBooks, setMuslimLifeBooks] = useState([]);
+  const [womenBooks, setWomenBooks] = useState([]);
+  const [selfPurificationBooks, setSelfPurificationBooks] = useState([]);
+  const [talimBooks, setTalimBooks] = useState([]);
+  const [childrenBooks, setChildrenBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Loading state
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Fetch recent books from backend
+  // ─── Fetch all data ──────────────────────────────────────────
   useEffect(() => {
-    const loadRecentBooks = async () => {
+    const fetchAll = async () => {
       try {
-        const response = await fetch(
-          'http://localhost:5000/recent-books'
-        );
+        // Replace these with your actual http://localhost:5000 endpoints
+        const [recent, popular, muslim, women, self, talim, children] = await Promise.all([
+          fetch('http://localhost:5000/recent-books').then(res => res.json()),
+          fetch('http://localhost:5000/books/popular').then(res => res.json()),
+          fetch('http://localhost:5000/books/muslim-life').then(res => res.json()),
+          fetch('http://localhost:5000/books/women').then(res => res.json()),
+          fetch('http://localhost:5000/books/self-purification').then(res => res.json()),
+          fetch('http://localhost:5000/books/talim').then(res => res.json()),
+          fetch('http://localhost:5000/books/children').then(res => res.json()),
+        ]);
 
-        if (!response.ok) {
-          throw new Error(
-            `Failed to load books: ${response.status}`
-          );
-        }
-
-        const data = await response.json();
-
-        console.log('Recent books:', data);
-
-        setRecentBooks(data);
+        setRecentBooks(recent);
+        setPopularBooks(popular);
+        setMuslimLifeBooks(muslim);
+        setWomenBooks(women);
+        setSelfPurificationBooks(self);
+        setTalimBooks(talim);
+        setChildrenBooks(children);
       } catch (error) {
-        console.error(
-          'Recent books fetch error:',
-          error
-        );
-
-        // Empty array will show demoBooks
-        setRecentBooks([]);
+        console.error('Error fetching books:', error);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
-    loadRecentBooks();
+    fetchAll();
   }, []);
+
   return (
     <div>
-        <Banner></Banner>
-        <RecentBooks books={recentBooks} isLoading={isLoading}/>
-    </div>
-  )
-}
+      {/* ─── Recent Books (existing) ──────────────────────────── */}
+      <RecentBooks books={recentBooks} isLoading={loading} />
 
-export default Home
+      {/* ─── পাঠকপ্রিয় বই ────────────────────────────────────── */}
+      <BookSection
+        title="পাঠকপ্রিয় বই"
+        books={popularBooks}
+        isLoading={loading}
+        seeAllLink="/category/popular"
+        seeAllLabel="সব দেখুন"
+      />
+
+      {/* ─── মুসলিম জীবন রচিত ──────────────────────────────── */}
+      <BookSection
+        title="মুসলিম জীবন রচিত"
+        books={muslimLifeBooks}
+        isLoading={loading}
+        seeAllLink="/category/muslim-life"
+        seeAllLabel="সব দেখুন"
+      />
+
+      {/* ─── নারীদের নির্বাচিত বই ──────────────────────────── */}
+      <BookSection
+        title="নারীদের নির্বাচিত বই"
+        books={womenBooks}
+        isLoading={loading}
+        seeAllLink="/category/women"
+        seeAllLabel="সব দেখুন"
+      />
+
+      {/* ─── আমল ও আত্মশুদ্ধির বই ──────────────────────────── */}
+      <BookSection
+        title="আমল ও আত্মশুদ্ধির বই"
+        books={selfPurificationBooks}
+        isLoading={loading}
+        seeAllLink="/category/self-purification"
+        seeAllLabel="সব দেখুন"
+      />
+
+      {/* ─── তালীমের বই ────────────────────────────────────── */}
+      <BookSection
+        title="তালীমের বই"
+        books={talimBooks}
+        isLoading={loading}
+        seeAllLink="/category/talim"
+        seeAllLabel="সব দেখুন"
+      />
+
+      {/* ─── ছোটদের প্রিয় বই ────────────────────────────────── */}
+      <BookSection
+        title="ছোটদের প্রিয় বই"
+        books={childrenBooks}
+        isLoading={loading}
+        seeAllLink="/category/children"
+        seeAllLabel="সব দেখুন"
+      />
+    </div>
+  );
+};
+
+export default Home;

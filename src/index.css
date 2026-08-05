@@ -1,2 +1,39 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+
+
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .print\:shadow-none {
+    box-shadow: none !important;
+  }
+  body {
+    background: white !important;
+  }
+  .rounded-2xl {
+    border-radius: 0 !important;
+  }
+  .border {
+    border-color: #ddd !important;
+  }
+  .shadow-lg {
+    box-shadow: none !important;
+  }
+  .min-h-screen {
+    min-height: auto !important;
+  }
+  .py-12 {
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+  }
+  .gap-4 {
+    gap: 8px !important;
+  }
+  .space-y-6 {
+    space-y: 10px !important;
+  }
+}

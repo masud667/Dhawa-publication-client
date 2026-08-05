@@ -1,64 +1,146 @@
-import React from 'react'
-import { NavLink } from 'react-router'
-import Logo from './Logo/Logo'
+// src/components/Layout/Navbar.jsx
+import React, { useState } from 'react';
+import { NavLink, useNavigate } from 'react-router';
+import { FaSearch, FaUser, FaShoppingBag, FaBars, FaTimes } from 'react-icons/fa';
 
-function Navber() {
-    const NavItem =<>
-    <li><NavLink to="/">Home</NavLink></li>
-    <li><NavLink to="/Publish Book">Publish-book</NavLink></li>
-    <li><NavLink to="/Subjects">Subjects</NavLink></li>
-    <li><NavLink to="/Novel">Novel</NavLink></li>
-    <li><NavLink to="/About">About Us</NavLink></li>
-    <li><NavLink to="/Login">Login/Register</NavLink></li>
-    </>
+import UserMenu from '../Home/UserMenu';
+import CartDropdown from '../../cart/CartDropdown';
+import TopBar from '../../Layout/TopBar';
+import Logo from './Logo/Logo';
+import { menuItems } from '../../data/headerData';
+import { useCartStore } from '../../store/cartStore';
+
+
+const Navbar = () => {
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const totalItems = useCartStore((state) => state.totalItems);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+    }
+  };
+
   return (
-    <div className="navbar bg-base-100 shadow-sm">
-  <div className="flex-1">
-   <Logo></Logo>
-  </div>
-   <div>
-     <input type="text" placeholder="Search" className="input w-24 md:w-auto" />
-  </div>
-  <div className="flex-none">
-    <div className="dropdown dropdown-end">
-      <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
-        <div className="indicator">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /> </svg>
-          <span className="badge badge-sm indicator-item">8</span>
-        </div>
-      </div>
-      <div
-        tabIndex={0}
-        className="card card-sm dropdown-content bg-base-100 z-1 mt-3 w-52 shadow">
-        <div className="card-body">
-          <span className="text-lg font-bold">8 Items</span>
-          <span className="text-info">Subtotal: $999</span>
-          <div className="card-actions">
-            <button className="btn btn-primary btn-block">View cart</button>
+    <header className="sticky top-0 z-50 bg-emerald-700 text-white shadow-md">
+      {/* ─── Top Bar ────────────────────────────────────────── */}
+      <TopBar />
+
+      {/* ─── Main Nav ───────────────────────────────────────── */}
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between py-3">
+          {/* ─── Logo ────────────────────────────────────────── */}
+          <div className="flex-shrink-0">
+      <Logo/>
+          </div>
+
+          {/* ─── Desktop Menu ───────────────────────────────── */}
+          <nav className="hidden lg:flex items-center gap-6">
+            {menuItems.map((item) => (
+              <NavLink
+                key={item.id}
+                to={item.path}
+                className={({ isActive }) =>
+                  `text-sm font-medium transition-colors duration-200 text-white hover:text-gray-200 ${
+                    isActive ? 'text-emerald-900 border-b-2 border-emerald-500' : 'text-white'
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+
+          {/* ─── Search + Cart + User ───────────────────────── */}
+          <div className="flex items-center gap-3">
+            {/* ─── Search ────────────────────────────────────── */}
+            <form onSubmit={handleSearch} className="hidden md:flex items-center">
+              <input
+                type="text"
+                placeholder="বই খুঁজুন..."
+                className="input input-bordered input-sm w-40 lg:w-56 rounded-r-none border-gray-300 focus:border-emerald-500 focus:outline-none"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <button
+                type="submit"
+                className="btn btn-sm rounded-l-none bg-emerald-600 hover:bg-emerald-700 border-emerald-600 text-white"
+              >
+                <FaSearch size={14} />
+              </button>
+            </form>
+
+            {/* ─── Cart ──────────────────────────────────────── */}
+            <div className="dropdown dropdown-end">
+              <div tabIndex={0} role="button" className="btn btn-ghost btn-circle relative">
+                <FaShoppingBag size={20} className="text-white hover:text-white" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-600 text-xs font-bold text-white">
+                    {totalItems}
+                  </span>
+                )}
+              </div>
+              <CartDropdown />
+            </div>
+
+            {/* ─── User / Login ─────────────────────────────── */}
+            <UserMenu />
+
+            {/* ─── Mobile Menu Toggle ───────────────────────── */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden btn btn-ghost btn-circle"
+            >
+              {isMobileMenuOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+            </button>
           </div>
         </div>
-      </div>
-    </div>
-    <div className="dropdown dropdown-end">
-      <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-        <div className="w-10 rounded-full">
-          <img
-            alt="Tailwind CSS Navbar component"
-            src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
-        </div>
-      </div>
-      <ul
-        tabIndex="-1"
-        className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-        {NavItem}
-        
-      </ul>
-    </div>
-  </div>
- 
-</div>
 
-  )
-}
+        {/* ─── Mobile Menu ───────────────────────────────────── */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden py-4 border-t border-gray-100">
+            {/* Mobile Search */}
+            <form onSubmit={handleSearch} className="flex mb-4">
+              <input
+                type="text"
+                placeholder="বই খুঁজুন..."
+                className="input input-bordered input-sm flex-1 rounded-r-none border-gray-300 bg-white text-black outline-none"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <button
+                type="submit"
+                className="btn btn-sm rounded-l-none bg-emerald-600 hover:bg-emerald-700 border-emerald-600 text-white"
+              >
+                <FaSearch size={14} />
+              </button>
+            </form>
 
-export default Navber
+            <nav className="flex flex-col gap-2">
+              {menuItems.map((item) => (
+                <NavLink
+                  key={item.id}
+                  to={item.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      isActive ? 'bg-emerald-500 text-white' : 'text-white hover:bg-gray-50 hover:text-black'
+                    }`
+                  }
+                >
+                  {item.label}
+                </NavLink>
+              ))}
+            </nav>
+          </div>
+        )}
+      </div>
+    </header>
+  );
+};
+
+export default Navbar;
