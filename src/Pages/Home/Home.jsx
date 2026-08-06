@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RecentBooks } from './RecentBooks/RecentBooks';
 import { BookSection } from './BookSection';
+import Banner from './Banner';
 
 const Home = () => {
   // ─── State for all sections ────────────────────────────────
@@ -47,6 +48,8 @@ const Home = () => {
 
   return (
     <div>
+
+      <Banner></Banner>
       {/* ─── Recent Books (existing) ──────────────────────────── */}
       <RecentBooks books={recentBooks} isLoading={loading} />
 

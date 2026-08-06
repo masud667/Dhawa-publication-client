@@ -61,7 +61,7 @@ function Banner() {
 
 
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative overflow-hidden mt-[-20px]">
 
       {/* Carousel */}
       <div ref={emblaRef} className="overflow-hidden">
@@ -218,13 +218,13 @@ function Banner() {
         top-1/2
         -translate-y-1/2
         rounded-full
-        bg-white/80
+        
         p-2
         shadow-lg
         backdrop-blur
         "
       >
-        <ChevronLeft size={22}/>
+        <ChevronLeft size={22} />
       </button>
 
 
@@ -237,13 +237,13 @@ function Banner() {
         top-1/2
         -translate-y-1/2
         rounded-full
-        bg-white/80
+     
         p-2
         shadow-lg
         backdrop-blur
         "
       >
-        <ChevronRight size={22}/>
+        <ChevronRight size={22} />
       </button>
 
 
@@ -259,7 +259,7 @@ function Banner() {
         "
       >
 
-        {banners.map((_, index)=>(
+        {banners.map((_, index) => (
 
           <button
             key={index}
@@ -268,8 +268,7 @@ function Banner() {
               h-2
               rounded-full
               transition-all
-              ${
-                selectedIndex === index
+              ${selectedIndex === index
                 ? "w-8 bg-white"
                 : "w-2 bg-white/50"
               }

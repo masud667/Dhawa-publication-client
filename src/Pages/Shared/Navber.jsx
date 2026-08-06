@@ -17,6 +17,11 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const totalItems = useCartStore((state) => state.totalItems);
 
+  // ─── TopBar scroll hide state ──────────────────────────────
+  const [isTopBarVisible, setIsTopBarVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -26,16 +31,20 @@ const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-emerald-700 text-white shadow-md">
-      {/* ─── Top Bar ────────────────────────────────────────── */}
-      <TopBar />
-
+    <header className="sticky top-0 z-50  bg-emerald-700 text-white shadow-md">
+      {/* ─── Top Bar with slide animation ────────────────────── */}
+      <div
+        className={`transition-transform duration-300 ease-in-out ${!isTopBarVisible ? '-translate-y-full' : 'translate-y-0'
+          }`}
+      >
+        <TopBar />
+      </div>
       {/* ─── Main Nav ───────────────────────────────────────── */}
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between py-3">
           {/* ─── Logo ────────────────────────────────────────── */}
           <div className="flex-shrink-0">
-      <Logo/>
+            <Logo />
           </div>
 
           {/* ─── Desktop Menu ───────────────────────────────── */}
@@ -45,8 +54,7 @@ const Navbar = () => {
                 key={item.id}
                 to={item.path}
                 className={({ isActive }) =>
-                  `text-sm font-medium transition-colors duration-200 text-white hover:text-gray-200 ${
-                    isActive ? 'text-emerald-900 border-b-2 border-emerald-500' : 'text-white'
+                  `text-sm font-medium transition-colors duration-200 text-white hover:text-gray-200 ${isActive ? 'text-emerald-900 border-b-2 border-emerald-500' : 'text-white'
                   }`
                 }
               >
@@ -58,11 +66,11 @@ const Navbar = () => {
           {/* ─── Search + Cart + User ───────────────────────── */}
           <div className="flex items-center gap-3">
             {/* ─── Search ────────────────────────────────────── */}
-            <form onSubmit={handleSearch} className="hidden md:flex items-center">
+            <form onSubmit={handleSearch} className="hidden md:flex items-center ">
               <input
                 type="text"
                 placeholder="বই খুঁজুন..."
-                className="input input-bordered input-sm w-40 lg:w-56 rounded-r-none border-gray-300 focus:border-emerald-500 focus:outline-none"
+                className="input input-bordered input-sm w-40 lg:w-56 rounded-r-none border-gray-300 focus:border-emerald-500 focus:outline-none bg-white text-gray-900"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -127,8 +135,7 @@ const Navbar = () => {
                   to={item.path}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={({ isActive }) =>
-                    `px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      isActive ? 'bg-emerald-500 text-white' : 'text-white hover:bg-gray-50 hover:text-black'
+                    `px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive ? 'bg-emerald-500 text-white' : 'text-white hover:bg-gray-50 hover:text-black'
                     }`
                   }
                 >

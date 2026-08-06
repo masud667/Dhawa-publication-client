@@ -6,6 +6,7 @@ import Login from "../Pages/Home/Login";
 import Cart from "../cart/Cart";
 import Checkout from "../Checkout/Checkout";
 import Books from "../Pages/Books/Books";
+import NotFoundPage from "../NotFound";
 
 export const router = createBrowserRouter([
   {
@@ -22,9 +23,13 @@ export const router = createBrowserRouter([
       { path: 'books', element: <Books /> },
 
       {
-  path: '/books/:id',
-  element: <BookDetails />,
-}
+        path: '/books/:id',
+        element: <BookDetails />,
+      },
+      {
+        path: '*',
+        element: <NotFoundPage />,
+      }
     ]
   },
 ]);

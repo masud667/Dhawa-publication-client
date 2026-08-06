@@ -28,63 +28,63 @@ const Books = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const booksPerPage = 12;
 
-// ─── Fetch Books from DB ────────────────────────────────────
-useEffect(() => {
-  const controller = new AbortController();
+  // ─── Fetch Books from DB ────────────────────────────────────
+  useEffect(() => {
+    const controller = new AbortController();
 
-  const fetchBooks = async () => {
-    setIsLoading(true);
-    setError(null);
+    const fetchBooks = async () => {
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      const response = await fetch(
-        'http://localhost:5000/books',
-        {
-          signal: controller.signal,
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          `HTTP ${response.status}: ${response.statusText}`
+      try {
+        const response = await fetch(
+          'http://localhost:5000/books',
+          {
+            signal: controller.signal,
+          }
         );
-      }
 
-      const data = await response.json();
+        if (!response.ok) {
+          throw new Error(
+            `HTTP ${response.status}: ${response.statusText}`
+          );
+        }
 
-      // Make sure MongoDB API returns an array
-      if (!Array.isArray(data)) {
-        throw new Error('Invalid data format received');
-      }
+        const data = await response.json();
 
-      setBooks(data);
-      setFilteredBooks(data);
-    } catch (err) {
-      // Ignore request cancellation
-      if (err.name === 'AbortError') return;
+        // Make sure MongoDB API returns an array
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid data format received');
+        }
 
-      console.error('Error fetching books:', err);
+        setBooks(data);
+        setFilteredBooks(data);
+      } catch (err) {
+        // Ignore request cancellation
+        if (err.name === 'AbortError') return;
 
-      setError(
-        err.message ||
+        console.error('Error fetching books:', err);
+
+        setError(
+          err.message ||
           'Failed to load books. Please try again later.'
-      );
+        );
 
-      setBooks([]);
-      setFilteredBooks([]);
-    } finally {
-      if (!controller.signal.aborted) {
-        setIsLoading(false);
+        setBooks([]);
+        setFilteredBooks([]);
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
       }
-    }
-  };
+    };
 
-  fetchBooks();
+    fetchBooks();
 
-  return () => {
-    controller.abort();
-  };
-}, []);
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   // ─── Filter & Sort Logic ─────────────────────────────────────
   useEffect(() => {
@@ -175,7 +175,7 @@ useEffect(() => {
               placeholder="বই খুঁজুন..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-full border border-gray-200 py-2 pl-9 pr-3 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+              className="w-full rounded-full border border-gray-200 text-gray-900 placeholder:text-gray-500 py-2 pl-9 pr-3 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
             />
           </div>
 
@@ -187,14 +187,16 @@ useEffect(() => {
             {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </button>
 
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-3 ">
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="rounded-full border border-gray-200 bg-white py-2 pl-3 pr-7 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+              className="rounded-full border border-gray-200 bg-white py-2 pl-3 pr-7 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200 text-gray-900 placeholder:text-gray-500"
             >
               {categories.map((cat) => (
-                <option key={cat} value={cat}>
+                <option
+
+                  key={cat} value={cat}>
                   {cat === 'all' ? 'সব ক্যাটাগরি' : cat}
                 </option>
               ))}
@@ -203,7 +205,7 @@ useEffect(() => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="rounded-full border border-gray-200 bg-white py-2 pl-3 pr-7 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+              className="rounded-full border border-gray-200 bg-white py-2 pl-3 pr-7 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200 text-gray-900 placeholder:text-gray-500"
             >
               <option value="newest">সর্বশেষ</option>
               <option value="price-low">দাম: কম→বেশি</option>
@@ -214,17 +216,15 @@ useEffect(() => {
             <div className="flex gap-1 rounded-full border border-gray-200 p-1">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`rounded-full p-1.5 transition ${
-                  viewMode === 'grid' ? 'bg-emerald-100 text-emerald-700' : 'text-gray-400'
-                }`}
+                className={`rounded-full p-1.5 transition ${viewMode === 'grid' ? 'bg-emerald-100 text-emerald-700' : 'text-gray-400'
+                  }`}
               >
                 <Grid className="h-4 w-4" />
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`rounded-full p-1.5 transition ${
-                  viewMode === 'list' ? 'bg-emerald-100 text-emerald-700' : 'text-gray-400'
-                }`}
+                className={`rounded-full p-1.5 transition ${viewMode === 'list' ? 'bg-emerald-100 text-emerald-700' : 'text-gray-400'
+                  }`}
               >
                 <List className="h-4 w-4" />
               </button>
@@ -247,11 +247,11 @@ useEffect(() => {
             >
               <div className="rounded-2xl bg-white p-4 shadow-sm border border-amber-200/30 space-y-3">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">ক্যাটাগরি</label>
+                  <label className="mb-1 block text-sm font-medium text-emerald-600">ক্যাটাগরি</label>
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full rounded-lg border border-gray-200 py-2 pl-3 pr-8 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                    className="w-full rounded-lg border border-gray-200 py-2 pl-3 pr-8 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200 text-gray-900 placeholder:text-gray-500 text-gray-900 placeholder:text-gray-500"
                   >
                     {categories.map((cat) => (
                       <option key={cat} value={cat}>
@@ -261,11 +261,11 @@ useEffect(() => {
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">সাজান</label>
+                  <label className="mb-1 block text-sm font-medium text-emerald-600">সাজান</label>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="w-full rounded-lg border border-gray-200 py-2 pl-3 pr-8 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                    className="w-full rounded-lg border border-gray-200 py-2 pl-3 pr-8 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200 text-gray-900 placeholder:text-gray-500"
                   >
                     <option value="newest">সর্বশেষ</option>
                     <option value="price-low">দাম: কম→বেশি</option>
@@ -341,11 +341,10 @@ useEffect(() => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className={`grid grid-cols-2 gap-4 sm:gap-5 ${
-              viewMode === 'grid'
-                ? 'sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4'
-                : 'sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1'
-            }`}
+            className={`grid grid-cols-2 gap-4 sm:gap-5 ${viewMode === 'grid'
+              ? 'sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4'
+              : 'sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1'
+              }`}
           >
             {currentBooks.map((book, index) => (
               <motion.div
@@ -399,16 +398,20 @@ useEffect(() => {
           </motion.div>
         )}
 
+
         {/* ─── Pagination ────────────────────────────────────── */}
         {!isLoading && filteredBooks.length > 0 && totalPages > 1 && (
           <div className="mt-10 flex flex-wrap items-center justify-center gap-2">
+            {/* Previous button */}
             <button
               onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
               disabled={currentPage === 1}
-              className="rounded-full border border-gray-200 px-3 py-1.5 text-sm transition hover:bg-gray-50 disabled:opacity-50"
+              className="rounded-full border border-emerald-200/40 bg-white/60 px-4 py-1.5 text-sm font-medium text-emerald-700 transition hover:bg-emerald-50 hover:shadow-md disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:shadow-none"
             >
               ← আগে
             </button>
+
+            {/* Page numbers */}
             {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
               let pageNum;
               if (totalPages <= 5) pageNum = i + 1;
@@ -419,25 +422,29 @@ useEffect(() => {
                 <button
                   key={pageNum}
                   onClick={() => setCurrentPage(pageNum)}
-                  className={`h-9 w-9 rounded-full text-sm font-medium transition ${
-                    currentPage === pageNum
-                      ? 'bg-emerald-600 text-white shadow-md'
-                      : 'border border-gray-200 hover:bg-gray-50'
-                  }`}
+                  className={`h-9 w-9 rounded-full text-sm font-medium transition ${currentPage === pageNum
+                    ? 'bg-gradient-to-r from-emerald-700 to-emerald-800 text-white shadow-md shadow-emerald-700/30 ring-2 ring-emerald-200'
+                    : 'border border-emerald-200/30 bg-white/60 text-gray-700 hover:bg-emerald-50 hover:border-emerald-300'
+                    }`}
                 >
                   {pageNum}
                 </button>
               );
             })}
+
+            {/* Next button */}
             <button
               onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="rounded-full border border-gray-200 px-3 py-1.5 text-sm transition hover:bg-gray-50 disabled:opacity-50"
+              className="rounded-full border border-emerald-200/40 bg-white/60 px-4 py-1.5 text-sm font-medium text-emerald-700 transition hover:bg-emerald-50 hover:shadow-md disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:shadow-none"
             >
               পরে →
             </button>
           </div>
         )}
+
+
+
       </div>
     </div>
   );

@@ -102,7 +102,7 @@ export const BookDetails = () => {
     };
     getBook();
   }, [id]);
- 
+
 
   // ─── Buy Now (open PDF modal) ──────────────────────────────
   const handleBuyNow = () => {
@@ -360,56 +360,56 @@ export const BookDetails = () => {
               </div>
 
               {/* ─── Quantity + Cart ──────────────────────── */}
-<div className="mt-7 flex flex-wrap items-center gap-3">
-  {/* ─── Quantity Selector ────────────────── */}
-  <div className="flex h-12 items-center rounded-full border border-amber-200/50 bg-white shadow-sm">
-    <button
-      type="button"
-      onClick={decreaseQuantity}
-      className="flex h-full w-11 items-center justify-center rounded-l-full text-gray-500 transition hover:bg-amber-50 hover:text-[#174D3B]"
-      aria-label="Decrease quantity"
-    >
-      <Minus className="h-4 w-4" />
-    </button>
-    <span className="flex h-full min-w-12 items-center justify-center px-3 font-semibold text-[#263D35]">
-      {quantity}
-    </span>
-    <button
-      type="button"
-      onClick={increaseQuantity}
-      className="flex h-full w-11 items-center justify-center rounded-r-full text-gray-500 transition hover:bg-amber-50 hover:text-[#174D3B]"
-      aria-label="Increase quantity"
-    >
-      <Plus className="h-4 w-4" />
-    </button>
-  </div>
+              <div className="mt-7 flex flex-wrap items-center gap-3">
+                {/* ─── Quantity Selector ────────────────── */}
+                <div className="flex h-12 items-center rounded-full border border-amber-200/50 bg-white shadow-sm">
+                  <button
+                    type="button"
+                    onClick={decreaseQuantity}
+                    className="flex h-full w-11 items-center justify-center rounded-l-full text-gray-500 transition hover:bg-amber-50 hover:text-[#174D3B]"
+                    aria-label="Decrease quantity"
+                  >
+                    <Minus className="h-4 w-4" />
+                  </button>
+                  <span className="flex h-full min-w-12 items-center justify-center px-3 font-semibold text-[#263D35]">
+                    {quantity}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={increaseQuantity}
+                    className="flex h-full w-11 items-center justify-center rounded-r-full text-gray-500 transition hover:bg-amber-50 hover:text-[#174D3B]"
+                    aria-label="Increase quantity"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
 
-  {/* ─── Reusable Add to Cart Button ────────────────── */}
-  <AddToCartButton
-    product={{
-      id: book._id,
-      title: book.title,
-      price: discountPrice,
-      image: book.image,
-    }}
-    quantity={quantity}
-    disabled={Number(book.stock) <= 0}
-    size="lg"
-    variant="primary"
-    label="কার্টে যোগ করুন"
-    className="px-8"
-  />
+                {/* ─── Reusable Add to Cart Button ────────────────── */}
+                <AddToCartButton
+                  product={{
+                    id: book._id,
+                    title: book.title,
+                    price: discountPrice,
+                    image: book.image,
+                  }}
+                  quantity={quantity}
+                  disabled={Number(book.stock) <= 0}
+                  size="lg"
+                  variant="primary"
+                  label="কার্টে যোগ করুন"
+                  className="px-8"
+                />
 
-  {/* ─── Buy Now ────────────────────────────────────────── */}
-  <button
-    type="button"
-    disabled={Number(book.stock) <= 0}
-    onClick={handleBuyNow}
-    className="inline-flex h-12 items-center justify-center rounded-full border-2 border-amber-600 bg-transparent px-8 text-sm font-bold text-amber-600 transition hover:bg-amber-600 hover:text-white disabled:cursor-not-allowed disabled:border-gray-300 disabled:text-gray-300"
-  >
-    এখনই নমুনা পড়ুন
-  </button>
-</div>
+                {/* ─── Buy Now ────────────────────────────────────────── */}
+                <button
+                  type="button"
+                  disabled={Number(book.stock) <= 0}
+                  onClick={handleBuyNow}
+                  className="inline-flex h-12 items-center justify-center rounded-full border-2 border-amber-600 bg-transparent px-8 text-sm font-bold text-amber-600 transition hover:bg-amber-600 hover:text-white disabled:cursor-not-allowed disabled:border-gray-300 disabled:text-gray-300"
+                >
+                  এখনই নমুনা পড়ুন
+                </button>
+              </div>
               {/* ─── Stock Note ───────────────────────────── */}
               {Number(book.stock) > 0 && (
                 <p className="mt-4 flex items-center gap-2 text-sm text-emerald-600">
@@ -588,7 +588,7 @@ export const BookDetails = () => {
         </div>
       </section>
 
-       {/* ─── PDF MODAL ────────────────────────────────────────── */}
+      {/* ─── PDF MODAL ────────────────────────────────────────── */}
       <AnimatePresence>
         {showPdfModal && (
           <motion.div
@@ -654,9 +654,8 @@ const DetailRow = ({ icon, label, value, isLast = false }) => {
 
   return (
     <div
-      className={`grid grid-cols-[120px_minmax(0,1fr)] sm:grid-cols-[160px_minmax(0,1fr)] ${
-        !isLast ? 'border-b border-amber-200/30' : ''
-      }`}
+      className={`grid grid-cols-[120px_minmax(0,1fr)] sm:grid-cols-[160px_minmax(0,1fr)] ${!isLast ? 'border-b border-amber-200/30' : ''
+        }`}
     >
       <div className="flex items-center gap-2 bg-[#F1EDE5] px-5 py-3.5 text-sm font-semibold text-[#34453D]">
         <span className="text-amber-600">{icon}</span>
@@ -676,41 +675,41 @@ const RelatedBooks = ({ category, currentBookId }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-  const fetchRelated = async () => {
-    // Do not call API if required data is missing
-    if (!category || !currentBookId) {
-      setRelatedBooks([]);
-      setIsLoading(false);
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const response = await fetch(
-        `http://localhost:5000/books/related?category=${encodeURIComponent(
-          category
-        )}&exclude=${currentBookId}`
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch related books');
+    const fetchRelated = async () => {
+      // Do not call API if required data is missing
+      if (!category || !currentBookId) {
+        setRelatedBooks([]);
+        setIsLoading(false);
+        return;
       }
 
-      const data = await response.json();
+      setIsLoading(true);
 
-      setRelatedBooks(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error('Error fetching related books:', error);
+      try {
+        const response = await fetch(
+          `http://localhost:5000/books/related?category=${encodeURIComponent(
+            category
+          )}&exclude=${currentBookId}`
+        );
 
-      setRelatedBooks([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        if (!response.ok) {
+          throw new Error('Failed to fetch related books');
+        }
 
-  fetchRelated();
-}, [category, currentBookId]);
+        const data = await response.json();
+
+        setRelatedBooks(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('Error fetching related books:', error);
+
+        setRelatedBooks([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRelated();
+  }, [category, currentBookId]);
   // ─── Embla Carousel Setup ──────────────────────────────────
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {
@@ -795,6 +794,8 @@ const RelatedBooks = ({ category, currentBookId }) => {
             </div>
           </div>
 
+
+
           {/* ─── Navigation Arrows ────────────────────────── */}
           {relatedBooks.length > 0 && (
             <>
@@ -826,11 +827,10 @@ const RelatedBooks = ({ category, currentBookId }) => {
                 key={index}
                 type="button"
                 onClick={() => emblaApi?.scrollTo(index)}
-                className={`transition-all duration-500 rounded-full ${
-                  index === selectedIndex
-                    ? 'w-10 h-2 bg-gradient-to-r from-amber-500 to-emerald-600 shadow-md'
-                    : 'w-2 h-2 bg-gray-300 hover:bg-gray-400'
-                }`}
+                className={`transition-all duration-500 rounded-full ${index === selectedIndex
+                  ? 'w-10 h-2 bg-gradient-to-r from-amber-500 to-emerald-600 shadow-md'
+                  : 'w-2 h-2 bg-gray-300 hover:bg-gray-400'
+                  }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}
