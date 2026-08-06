@@ -7,6 +7,7 @@ import Cart from "../cart/Cart";
 import Checkout from "../Checkout/Checkout";
 import Books from "../Pages/Books/Books";
 import NotFoundPage from "../NotFound";
+import Subjects from "../Pages/Subjects";
 
 export const router = createBrowserRouter([
   {
@@ -21,7 +22,7 @@ export const router = createBrowserRouter([
       { path: 'cart', element: <Cart /> },
       { path: 'checkout', element: <Checkout /> },
       { path: 'books', element: <Books /> },
-
+      { path: 'subjects', element: <Subjects /> },
       {
         path: '/books/:id',
         element: <BookDetails />,
