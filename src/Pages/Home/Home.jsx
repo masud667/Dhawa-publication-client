@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { RecentBooks } from './RecentBooks/RecentBooks';
 import { BookSection } from './BookSection';
 import Banner from './Banner';
+import api from '../../api/axios';
 
 const Home = () => {
   // ─── State for all sections ────────────────────────────────
@@ -18,26 +19,33 @@ const Home = () => {
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        // Replace these with your actual http://localhost:5000 endpoints
-        const [recent, popular, muslim, women, self, talim, children] = await Promise.all([
-          fetch('http://localhost:5000/recent-books').then(res => res.json()),
-          fetch('http://localhost:5000/books/popular').then(res => res.json()),
-          fetch('http://localhost:5000/books/muslim-life').then(res => res.json()),
-          fetch('http://localhost:5000/books/women').then(res => res.json()),
-          fetch('http://localhost:5000/books/self-purification').then(res => res.json()),
-          fetch('http://localhost:5000/books/talim').then(res => res.json()),
-          fetch('http://localhost:5000/books/children').then(res => res.json()),
+        const [
+          recent,
+          popular,
+          muslim,
+          women,
+          self,
+          talim,
+          children,
+        ] = await Promise.all([
+          api.get("/home/recent-books"),
+          api.get("/home/popular"),
+          api.get("/home/muslim-life"),
+          api.get("/home/women"),
+          api.get("/home/self-purification"),
+          api.get("/home/talim"),
+          api.get("/home/children"),
         ]);
 
-        setRecentBooks(recent);
-        setPopularBooks(popular);
-        setMuslimLifeBooks(muslim);
-        setWomenBooks(women);
-        setSelfPurificationBooks(self);
-        setTalimBooks(talim);
-        setChildrenBooks(children);
+        setRecentBooks(recent.data);
+        setPopularBooks(popular.data);
+        setMuslimLifeBooks(muslim.data);
+        setWomenBooks(women.data);
+        setSelfPurificationBooks(self.data);
+        setTalimBooks(talim.data);
+        setChildrenBooks(children.data);
       } catch (error) {
-        console.error('Error fetching books:', error);
+        console.error("❌ Error fetching home data:", error);
       } finally {
         setLoading(false);
       }
