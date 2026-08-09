@@ -35,19 +35,31 @@ export const router = createBrowserRouter([
 
       {
         path: '/admin',
+        element: <AdminLayout />,
         children: [
-          { index: true, element: <Navigate to="/admin/dashboard" /> },
-          // { path: 'login', element: <AdminLogin /> },
           {
-            path: '',
-            element: <AdminLayout />,
-            children: [
-              { path: 'dashboard', element: <AdminDashboard /> },
-              { path: 'products', element: <ProductList /> },
-              { path: 'products/create', element: <ProductForm /> },
-              { path: 'products/edit/:id', element: <ProductForm /> },
+            index: true,
+            element: <Navigate to="/admin/dashboard" replace />,
+          },
 
-            ],
+          {
+            path: 'dashboard',
+            element: <AdminDashboard />,
+          },
+
+          {
+            path: 'books',
+            element: <ProductList />,
+          },
+
+          {
+            path: 'books/create',
+            element: <ProductForm />,
+          },
+
+          {
+            path: 'books/edit/:id',
+            element: <ProductForm />,
           },
         ],
       },
