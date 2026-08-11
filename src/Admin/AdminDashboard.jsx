@@ -27,7 +27,7 @@ const AdminDashboard = () => {
         const fetchStats = async () => {
             try {
                 const { data } = await axios.get(
-                    'http://localhost:5000/admin/stats'
+                    'https://dhawa-publication-server.vercel.app/admin/stats'
                 );
 
                 setStats({

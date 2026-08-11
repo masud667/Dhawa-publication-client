@@ -12,7 +12,7 @@ const ProductList = () => {
     const fetchbooks = async () => {
         try {
             const token = localStorage.getItem('admin-token');
-            const { data } = await axios.get('http://localhost:5000/books', {
+            const { data } = await axios.get('https://dhawa-publication-server.vercel.app/books', {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setBooks(data);
@@ -37,7 +37,7 @@ const ProductList = () => {
             console.log("Deleting book:", id);
 
             const response = await axios.delete(
-                `http://localhost:5000/books/${id}`
+                `https://dhawa-publication-server.vercel.app/books/${id}`
             );
 
             console.log("Delete response:", response.data);

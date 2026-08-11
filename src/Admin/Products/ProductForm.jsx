@@ -52,7 +52,7 @@ const ProductForm = () => {
                 setCategoryLoading(true);
 
                 const { data } = await axios.get(
-                    'http://localhost:5000/categories'
+                    'https://dhawa-publication-server.vercel.app/categories'
                 );
 
                 setCategories(Array.isArray(data) ? data : []);
@@ -77,7 +77,7 @@ const ProductForm = () => {
 
         try {
             const { data } = await axios.post(
-                'http://localhost:5000/categories',
+                'https://dhawa-publication-server.vercel.app/categories',
                 {
                     name,
                     slug: name
@@ -125,7 +125,7 @@ const ProductForm = () => {
     const fetchProduct = async () => {
         try {
             const token = localStorage.getItem('admin-token');
-            const { data } = await axios.get(`http://localhost:5000/books/${id}`, {
+            const { data } = await axios.get(`https://dhawa-publication-server.vercel.app/books/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setFormData(data);
@@ -231,14 +231,14 @@ const ProductForm = () => {
 
             if (id) {
                 await axios.patch(
-                    `http://localhost:5000/books/${id}`,
+                    `https://dhawa-publication-server.vercel.app/books/${id}`,
                     bookData
                 );
 
                 toast.success('Book updated successfully!');
             } else {
                 await axios.post(
-                    'http://localhost:5000/books',
+                    'https://dhawa-publication-server.vercel.app/books',
                     bookData
                 );
 

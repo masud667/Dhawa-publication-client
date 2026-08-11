@@ -90,7 +90,7 @@ export const BookDetails = () => {
         setError('');
 
         const { data } = await axios.get(
-          `http://localhost:5000/books/${id}`
+          `https://dhawa-publication-server.vercel.app/books/${id}`
         );
 
         setBook(data);
@@ -690,7 +690,7 @@ const RelatedBooks = ({ book }) => {
 
       try {
         const { data } = await axios.get(
-          'http://localhost:5000/books/related',
+          'https://dhawa-publication-server.vercel.app/books/related',
           {
             params: {
               category: book.category,

@@ -150,7 +150,7 @@ const Subjects = () => {
 
             try {
                 const { data } = await axios.get(
-                    'http://localhost:5000/categories'
+                    'https://dhawa-publication-server.vercel.app/categories'
                 );
 
                 if (Array.isArray(data) && data.length > 0) {

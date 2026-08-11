@@ -38,7 +38,7 @@ const Books = () => {
 
       try {
         const response = await fetch(
-          'http://localhost:5000/books',
+          'https://dhawa-publication-server.vercel.app/books',
           {
             signal: controller.signal,
           }
