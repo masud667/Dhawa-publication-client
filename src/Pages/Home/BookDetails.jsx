@@ -28,6 +28,7 @@ import { useCartStore } from '../../store/cartStore';
 
 import { BookCard } from './RecentBooks/BookCard'; // adjust path
 import { AddToCartButton } from '../Shared';
+import axios from 'axios';
 
 const FALLBACK_IMAGE =
   'https://placehold.co/600x850/F4F0E8/174D3B?text=Dhawa+Publication';
@@ -87,20 +88,28 @@ export const BookDetails = () => {
       try {
         setIsLoading(true);
         setError('');
-        const response = await fetch(`http://localhost:5000/books/${id}`);
-        if (!response.ok) {
-          throw new Error('Book not found');
-        }
-        const data = await response.json();
+
+        const { data } = await axios.get(
+          `http://localhost:5000/books/${id}`
+        );
+
         setBook(data);
       } catch (error) {
-        console.error('Book details error:', error);
+        console.error(
+          'Book details error:',
+          error.response?.data || error.message
+        );
+
+        setBook(null);
         setError('বইটির তথ্য পাওয়া যায়নি।');
       } finally {
         setIsLoading(false);
       }
     };
-    getBook();
+
+    if (id) {
+      getBook();
+    }
   }, [id]);
 
 
@@ -546,7 +555,7 @@ export const BookDetails = () => {
       </section>
 
       {/* ─── Related Books Section ──────────────────────────── */}
-      <RelatedBooks category={book.category || book.section} currentBookId={book._id} />
+      {book && <RelatedBooks book={book} />}
 
       {/* ─── Description Section ────────────────────────────── */}
       <section className="relative border-t border-amber-200/30 bg-gradient-to-b from-[#F1EDE5] to-[#FAF9F5] py-16">
@@ -669,47 +678,40 @@ const DetailRow = ({ icon, label, value, isLast = false }) => {
 };
 
 // ─── Related Books Component ──────────────────────────────────
-const RelatedBooks = ({ category, currentBookId }) => {
+const RelatedBooks = ({ book }) => {
   // ─── Mock related books – replace with API call ──────────
   const [relatedBooks, setRelatedBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // ─── Fetch Related Books ──────────────────────────────────
   useEffect(() => {
     const fetchRelated = async () => {
-      // Do not call API if required data is missing
-      if (!category || !currentBookId) {
-        setRelatedBooks([]);
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(true);
+      if (!book?._id || !book?.category) return;
 
       try {
-        const response = await fetch(
-          `http://localhost:5000/books/related?category=${encodeURIComponent(
-            category
-          )}&exclude=${currentBookId}`
+        const { data } = await axios.get(
+          'http://localhost:5000/books/related',
+          {
+            params: {
+              category: book.category,
+              exclude: book._id,
+            },
+          }
         );
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch related books');
-        }
-
-        const data = await response.json();
-
-        setRelatedBooks(Array.isArray(data) ? data : []);
+        setRelatedBooks(data);
       } catch (error) {
-        console.error('Error fetching related books:', error);
+        console.error(
+          'Error fetching related books:',
+          error.response?.data || error.message
+        );
 
         setRelatedBooks([]);
-      } finally {
-        setIsLoading(false);
       }
     };
 
     fetchRelated();
-  }, [category, currentBookId]);
+  }, [book?._id, book?.category]);
   // ─── Embla Carousel Setup ──────────────────────────────────
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {

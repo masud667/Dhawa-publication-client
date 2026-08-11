@@ -9,6 +9,10 @@ const ProductForm = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
+    const [categories, setCategories] = useState([]);
+    const [showCategoryForm, setShowCategoryForm] = useState(false);
+    const [newCategory, setNewCategory] = useState('');
+    const [categoryLoading, setCategoryLoading] = useState(false);
     const [formData, setFormData] = useState({
         title: '',
         slug: '',
@@ -17,26 +21,21 @@ const ProductForm = () => {
         image: '',
         gallery: [],
         description: '',
-
         price: '',
         discountPrice: '',
-
-        rating: '',
-        totalReviews: '',
+        rating: 0,
+        totalReviews: 0,
         stock: '',
-        sold: '',
-
+        sold: 0,
         language: 'বাংলা',
         pages: '',
-        publisher: '',
+        publisher: 'Dhawa Publication',
         isbn: '',
         edition: '',
         publishDate: '',
-
         featured: false,
         recent: false,
         bestSeller: false,
-
         status: 'published',
     });
     const [imageType, setImageType] = useState('upload');
@@ -48,11 +47,81 @@ const ProductForm = () => {
     const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
     useEffect(() => {
-        if (id) {
-            fetchProduct();
-        }
-    }, [id]);
+        const fetchCategories = async () => {
+            try {
+                setCategoryLoading(true);
 
+                const { data } = await axios.get(
+                    'http://localhost:5000/categories'
+                );
+
+                setCategories(Array.isArray(data) ? data : []);
+            } catch (error) {
+                console.error('Category fetch error:', error);
+            } finally {
+                setCategoryLoading(false);
+            }
+        };
+
+        fetchCategories();
+    }, []);
+
+
+    const handleAddCategory = async () => {
+        const name = newCategory.trim();
+
+        if (!name) {
+            toast.error('Category name is required');
+            return;
+        }
+
+        try {
+            const { data } = await axios.post(
+                'http://localhost:5000/categories',
+                {
+                    name,
+                    slug: name
+                        .toLowerCase()
+                        .trim()
+                        .replace(/\s+/g, '-'),
+                    image: '',
+                }
+            );
+
+            const createdCategory = {
+                _id: data.insertedId,
+                name,
+                slug: name
+                    .toLowerCase()
+                    .trim()
+                    .replace(/\s+/g, '-'),
+                image: '',
+            };
+
+            setCategories((prev) => [
+                ...prev,
+                createdCategory,
+            ]);
+
+            setFormData((prev) => ({
+                ...prev,
+                category: name,
+            }));
+
+            setNewCategory('');
+            setShowCategoryForm(false);
+
+            toast.success('Category created successfully!');
+        } catch (error) {
+            console.error('Create category error:', error);
+
+            if (error.response?.status === 409) {
+                toast.error('Category already exists');
+            } else {
+                toast.error('Failed to create category');
+            }
+        }
+    };
     const fetchProduct = async () => {
         try {
             const token = localStorage.getItem('admin-token');
@@ -282,25 +351,72 @@ const ProductForm = () => {
                             />
                         </div>
 
-
-                        {/* Category */}
-
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Category *
                             </label>
 
-                            <input
-                                type="text"
+                            <select
                                 name="category"
                                 value={formData.category}
-                                onChange={handleChange}
-                                placeholder="ইসলামিক জীবনধারা"
-                                required
-                                className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-gray-900 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
-                            />
-                        </div>
+                                onChange={(e) => {
+                                    if (e.target.value === '__add_new__') {
+                                        setShowCategoryForm(true);
+                                        return;
+                                    }
 
+                                    handleChange(e);
+                                }}
+                                required
+                                className="w-full rounded-lg border border-gray-200 px-4 py-2.5
+        bg-white text-gray-900
+        focus:border-emerald-500
+        focus:ring-2 focus:ring-emerald-200
+        outline-none"
+                            >
+                                <option value="">
+                                    Select Category
+                                </option>
+
+                                {categories.map((category) => (
+                                    <option
+                                        key={category._id}
+                                        value={category.name}
+                                    >
+                                        {category.name}
+                                    </option>
+                                ))}
+
+                                <option value="__add_new__">
+                                    + Add New Category
+                                </option>
+                            </select>
+                            {showCategoryForm && (
+                                <div className="mt-3 p-4 rounded-xl bg-emerald-50 border border-emerald-100">
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={newCategory}
+                                            onChange={(e) => setNewCategory(e.target.value)}
+                                            placeholder="Enter new category"
+                                            className="flex-1 rounded-lg border border-gray-200
+                bg-white px-4 py-2.5 text-gray-900
+                outline-none focus:border-emerald-500"
+                                        />
+
+                                        <button
+                                            type="button"
+                                            onClick={handleAddCategory}
+                                            className="px-4 py-2.5 rounded-lg
+                bg-emerald-700 text-white
+                hover:bg-emerald-800 transition"
+                                        >
+                                            Add
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
 
                         {/* Publisher */}
 

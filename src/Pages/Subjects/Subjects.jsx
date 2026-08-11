@@ -5,6 +5,7 @@ import {
     BookOpen, TrendingUp, Users, Sparkles, Heart, Star, Clock, Compass, Layers,
     ChevronRight
 } from 'lucide-react';
+import axios from 'axios';
 
 // ─── Map category names to icons ──────────────────────────────
 const subjectIcons = {
@@ -141,35 +142,37 @@ const Subjects = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const containerRef = useRef(null);
-
     // ─── Fetch subjects from backend ──────────────────────────────
     useEffect(() => {
         const fetchSubjects = async () => {
             setIsLoading(true);
             setError(null);
+
             try {
-                const response = await fetch('http://localhost:5000/categories');
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                const data = await response.json();
+                const { data } = await axios.get(
+                    'http://localhost:5000/categories'
+                );
+
                 if (Array.isArray(data) && data.length > 0) {
                     setSubjects(data);
                 } else {
-                    setError('কোনো বিষয় পাওয়া যায়নি। আপনার বইগুলোর category ফিল্ড চেক করুন।');
                     setSubjects([]);
+                    setError('কোনো বিষয় পাওয়া যায়নি।');
                 }
             } catch (err) {
                 console.error('❌ Error fetching subjects:', err);
-                setError('ডেটাবেস থেকে বিষয় লোড করতে সমস্যা হয়েছে। সার্ভার চালু আছে কিনা যাচাই করুন।');
+
                 setSubjects([]);
+                setError(
+                    'ডেটাবেস থেকে বিষয় লোড করতে সমস্যা হয়েছে। সার্ভার চালু আছে কিনা যাচাই করুন।'
+                );
             } finally {
                 setIsLoading(false);
             }
         };
+
         fetchSubjects();
     }, []);
-
     // ─── Loading State ─────────────────────────────────────────────
     if (isLoading) {
         return (
