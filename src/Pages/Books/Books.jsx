@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { BookCardSkeleton } from '../Home/RecentBooks/BookCardSkeleton';
 import { BookCard } from '../Home/RecentBooks/BookCard';
+import api from '../../api/axios';
 
 
 const Books = () => {
@@ -37,8 +38,7 @@ const Books = () => {
       setError(null);
 
       try {
-        const response = await fetch(
-          'https://dhawa-publication-server.vercel.app/books',
+        const response = await api.get("/books",
           {
             signal: controller.signal,
           }

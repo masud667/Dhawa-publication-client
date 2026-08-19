@@ -9,6 +9,7 @@ import {
     ArrowUpRight,
 } from 'lucide-react';
 import axios from 'axios';
+import api from '../api/axios';
 
 const AdminDashboard = () => {
     const [stats, setStats] = useState({
@@ -26,9 +27,7 @@ const AdminDashboard = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const { data } = await axios.get(
-                    'https://dhawa-publication-server.vercel.app/admin/stats'
-                );
+                const { data } = await api.get("/admin/stats");
 
                 setStats({
                     totalBooks: data.totalBooks || 0,

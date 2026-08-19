@@ -6,6 +6,7 @@ import {
     ChevronRight
 } from 'lucide-react';
 import axios from 'axios';
+import api from '../../api/axios';
 
 // ─── Map category names to icons ──────────────────────────────
 const subjectIcons = {
@@ -149,9 +150,7 @@ const Subjects = () => {
             setError(null);
 
             try {
-                const { data } = await axios.get(
-                    'https://dhawa-publication-server.vercel.app/categories'
-                );
+                const { data } = await api.get("/categories");
 
                 if (Array.isArray(data) && data.length > 0) {
                     setSubjects(data);

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
+import api from '../../api/axios';
 
 const ProductForm = () => {
 
@@ -51,8 +52,7 @@ const ProductForm = () => {
             try {
                 setCategoryLoading(true);
 
-                const { data } = await axios.get(
-                    'https://dhawa-publication-server.vercel.app/categories'
+                const { data } = await api.get("/categories"
                 );
 
                 setCategories(Array.isArray(data) ? data : []);
@@ -76,8 +76,7 @@ const ProductForm = () => {
         }
 
         try {
-            const { data } = await axios.post(
-                'https://dhawa-publication-server.vercel.app/categories',
+            const { data } = await api.get("/categories",
                 {
                     name,
                     slug: name
@@ -125,7 +124,7 @@ const ProductForm = () => {
     const fetchProduct = async () => {
         try {
             const token = localStorage.getItem('admin-token');
-            const { data } = await axios.get(`https://dhawa-publication-server.vercel.app/books/${id}`, {
+            const { data } = await api.get(`/books/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setFormData(data);
@@ -230,15 +229,13 @@ const ProductForm = () => {
             // =========================================
 
             if (id) {
-                await axios.patch(
-                    `https://dhawa-publication-server.vercel.app/books/${id}`,
+                await api.patch(`/books/${id}`,
                     bookData
                 );
 
                 toast.success('Book updated successfully!');
             } else {
-                await axios.post(
-                    'https://dhawa-publication-server.vercel.app/books',
+                awaitapi.post("/books",
                     bookData
                 );
 

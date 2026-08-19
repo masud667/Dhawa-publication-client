@@ -29,6 +29,7 @@ import { useCartStore } from '../../store/cartStore';
 import { BookCard } from './RecentBooks/BookCard'; // adjust path
 import { AddToCartButton } from '../Shared';
 import axios from 'axios';
+import api from '../../api/axios';
 
 const FALLBACK_IMAGE =
   'https://placehold.co/600x850/F4F0E8/174D3B?text=Dhawa+Publication';
@@ -89,8 +90,7 @@ export const BookDetails = () => {
         setIsLoading(true);
         setError('');
 
-        const { data } = await axios.get(
-          `https://dhawa-publication-server.vercel.app/books/${id}`
+        const { data } = await api.get(`/books/${id}`
         );
 
         setBook(data);
@@ -689,8 +689,7 @@ const RelatedBooks = ({ book }) => {
       if (!book?._id || !book?.category) return;
 
       try {
-        const { data } = await axios.get(
-          'https://dhawa-publication-server.vercel.app/books/related',
+        const { data } = await api.get('/books/related',
           {
             params: {
               category: book.category,

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Plus, Edit, Trash2, Eye } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
+import api from '../../api/axios';
 
 const ProductList = () => {
     const [books, setBooks] = useState([]);
@@ -12,7 +13,7 @@ const ProductList = () => {
     const fetchbooks = async () => {
         try {
             const token = localStorage.getItem('admin-token');
-            const { data } = await axios.get('https://dhawa-publication-server.vercel.app/books', {
+            const { data } = await api.get("/books", {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setBooks(data);
@@ -36,9 +37,7 @@ const ProductList = () => {
         try {
             console.log("Deleting book:", id);
 
-            const response = await axios.delete(
-                `https://dhawa-publication-server.vercel.app/books/${id}`
-            );
+            const response = await api.delete(`/books/${id}`);
 
             console.log("Delete response:", response.data);
 
