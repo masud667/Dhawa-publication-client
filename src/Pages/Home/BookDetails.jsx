@@ -92,7 +92,7 @@ export const BookDetails = () => {
 
         const { data } = await api.get(`/books/${id}`
         );
-
+console.log(id)
         setBook(data);
       } catch (error) {
         console.error(

@@ -10,9 +10,9 @@ export const socialLinks = [
 export const menuItems = [
   { id: 'home', label: 'হোম', path: '/' },
   { id: 'books', label: 'বই', path: '/books' },
-  { id: 'publish-book', label: 'প্রকাশনা', path: '/publish-book' },
-  { id: 'categories', label: 'বিষয়', path: '/categories' },
-  { id: 'novel', label: 'উপন্যাস', path: '/novel' },
+  // { id: 'publish-book', label: 'প্রকাশনা', path: '/publish-book' },
+  // { id: 'categories', label: 'বিষয়', path: '/categories' },
+  // { id: 'novel', label: 'উপন্যাস', path: '/novel' },
   { id: 'about', label: 'আমাদের সম্পর্কে', path: '/about' },
 ];
 
