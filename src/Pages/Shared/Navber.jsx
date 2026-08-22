@@ -11,25 +11,25 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const lastScrollY = useRef(0);
+  // // const lastScrollY = useRef(0);
 
-  // ─── Scroll detection ──────────────────────────────────────
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY <= 20) {
-        setIsScrolled(false);
-      } else if (currentScrollY > lastScrollY.current) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-      lastScrollY.current = currentScrollY;
-    };
+  // // ─── Scroll detection ──────────────────────────────────────
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     const currentScrollY = window.scrollY;
+  //     if (currentScrollY <= 20) {
+  //       setIsScrolled(false);
+  //     } else if (currentScrollY > lastScrollY.current) {
+  //       setIsScrolled(true);
+  //     } else {
+  //       setIsScrolled(false);
+  //     }
+  //     lastScrollY.current = currentScrollY;
+  //   };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  //   window.addEventListener('scroll', handleScroll, { passive: true });
+  //   return () => window.removeEventListener('scroll', handleScroll);
+  // }, []);
 
   // ─── Mobile menu toggle ────────────────────────────────────
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
