@@ -689,7 +689,7 @@ const RelatedBooks = ({ book }) => {
       if (!book?._id || !book?.category) return;
 
       try {
-        const { data } = await api.get('/books/related',
+        const { data } = await api.get('/related',
           {
             params: {
               category: book.category,
