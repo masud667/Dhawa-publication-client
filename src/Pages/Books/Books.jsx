@@ -15,6 +15,7 @@ import { BookCard } from '../Home/RecentBooks/BookCard';
 import api from '../../api/axios';
 
 
+
 const Books = () => {
   // ─── State ──────────────────────────────────────────────────
   const [books, setBooks] = useState([]);
@@ -31,49 +32,32 @@ const Books = () => {
 
   // ─── Fetch Books from DB ────────────────────────────────────
   useEffect(() => {
-    const controller = new AbortController();
+    let isMounted = true;
 
     const fetchBooks = async () => {
-      setIsLoading(true);
-      setError(null);
-
       try {
-        const response = await api.get("/books",
-          {
-            signal: controller.signal,
-          }
-        );
+        setIsLoading(true);
+        setError(null);
 
-        if (!response.ok) {
-          throw new Error(
-            `HTTP ${response.status}: ${response.statusText}`
+        const response = await api.get("/books");
+
+        // console.log("📚 Books API:", response.data);
+
+        if (isMounted) {
+          setBooks(Array.isArray(response.data) ? response.data : []);
+        }
+      } catch (error) {
+        console.error("❌ Error fetching books:", error);
+
+        if (isMounted) {
+          setError(
+            error.response?.data?.message ||
+            error.message ||
+            "বই লোড করতে সমস্যা হয়েছে"
           );
         }
-
-        const data = await response.json();
-
-        // Make sure MongoDB API returns an array
-        if (!Array.isArray(data)) {
-          throw new Error('Invalid data format received');
-        }
-
-        setBooks(data);
-        setFilteredBooks(data);
-      } catch (err) {
-        // Ignore request cancellation
-        if (err.name === 'AbortError') return;
-
-        console.error('Error fetching books:', err);
-
-        setError(
-          err.message ||
-          'Failed to load books. Please try again later.'
-        );
-
-        setBooks([]);
-        setFilteredBooks([]);
       } finally {
-        if (!controller.signal.aborted) {
+        if (isMounted) {
           setIsLoading(false);
         }
       }
@@ -82,10 +66,9 @@ const Books = () => {
     fetchBooks();
 
     return () => {
-      controller.abort();
+      isMounted = false;
     };
   }, []);
-
   // ─── Filter & Sort Logic ─────────────────────────────────────
   useEffect(() => {
     let result = [...books];

@@ -235,7 +235,7 @@ const ProductForm = () => {
 
                 toast.success('Book updated successfully!');
             } else {
-                awaitapi.post("/books",
+                await api.post("/books",
                     bookData
                 );
 
