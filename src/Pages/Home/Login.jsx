@@ -1,11 +1,19 @@
-// src/pages/Login.jsx
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
-import { FaEnvelope, FaLock, FaUserPlus, FaFacebook, FaGoogle } from 'react-icons/fa';
+import React, { useState, useContext } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router';
+import { FaEnvelope, FaLock, FaFacebook, FaGoogle } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import { toast } from 'react-hot-toast';
+import { AuthContext } from '../../Context/AuthContext';
+import AuthSecureAxios from '../../Hook/AuthSecureAxios';
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { logIn, createUser, signInWithGoogle, signInWithFacebook, updateUserProfile } = useContext(AuthContext);
+
+  // Target destination route (e.g., /admin/dashboard), defaulting to home '/'
+  const from = location.state?.from?.pathname || '/';
+
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: '',
@@ -14,17 +22,108 @@ const Login = () => {
     confirmPassword: '',
   });
   const [rememberMe, setRememberMe] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+  const handleRedirectAfterLogin = async (userEmail) => {
+    try {
+      if (userEmail) {
+        // 1. Call backend admin verification route
+        const res = await AuthSecureAxios.get(`/users/admin/${userEmail}`);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Add your authentication logic here
-    console.log('Form submitted:', formData);
-    // navigate('/');
+
+
+        // 2. Check if server confirmed admin status
+        if (res.data && res.data.admin === true) {
+
+          navigate('/admin/dashboard', { replace: true });
+          return; // Stop execution so it doesn't navigate to home
+        }
+      }
+    } catch (err) {
+      console.warn("Admin check error:", err.message);
+    }
+
+    // Fallback for regular customer users
+    console.log("Redirecting regular user to:", from);
+    navigate(from, { replace: true });
   };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const cleanEmail = formData.email.trim();
+
+    if (!isLogin && formData.password !== formData.confirmPassword) {
+      toast.error('পাসওয়ার্ড দুটি মিলছে না');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      if (isLogin) {
+        const result = await logIn(cleanEmail, formData.password);
+        toast.success('সফলভাবে লগইন করা হয়েছে!');
+        await handleRedirectAfterLogin(result.user?.email || cleanEmail);
+      } else {
+        const result = await createUser(cleanEmail, formData.password);
+        await updateUserProfile(formData.fullName, '');
+        toast.success('অ্যাকাউন্ট সফলভাবে তৈরি করা হয়েছে!');
+        await handleRedirectAfterLogin(result.user?.email || cleanEmail);
+      }
+    } catch (err) {
+      console.error("Auth Error:", err.code, err.message);
+      if (err.code === 'auth/invalid-credential') {
+        toast.error('ইমেইল অথবা পাসওয়ার্ড ভুল হয়েছে।');
+      } else if (err.code === 'auth/email-already-in-use') {
+        toast.error('এই ইমেইলটি ইতিমধ্যে ব্যবহৃত হয়েছে।');
+      } else if (err.code === 'auth/weak-password') {
+        toast.error('পাসওয়ার্ড অন্তত ৬ অক্ষরের হতে হবে।');
+      } else {
+        toast.error('লগইন করতে ব্যর্থ হয়েছে। পুনরায় চেষ্টা করুন।');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+
+  const handleSocialLogin = async () => {
+    try {
+      // 1. Authenticate with Google
+      const result = await signInWithGoogle();
+      const user = result.user;
+
+      if (!user?.email) {
+        console.error("Google authentication failed: No email returned.");
+        return;
+      }
+
+      // 2. Save/Sync User to MongoDB Database
+      const userData = {
+        name: user.displayName || "",
+        email: user.email,
+        photo: user.photoURL || "",
+      };
+      await AuthSecureAxios.post('/users', userData);
+
+      // 3. Issue and Store JWT Token
+      const jwtRes = await AuthSecureAxios.post('/jwt', { email: user.email });
+      if (jwtRes.data?.token) {
+        localStorage.setItem('access-token', jwtRes.data.token);
+      } else {
+        console.warn("JWT token was not returned from server.");
+      }
+
+      // 4. Verify Admin status & Redirect
+      await handleRedirectAfterLogin(user.email);
+
+    } catch (error) {
+      console.error("❌ Social Login failed:", error.response?.data || error.message);
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-[#FAF9F5] flex items-center justify-center px-4 py-12">
@@ -34,7 +133,7 @@ const Login = () => {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden border border-amber-100/50"
       >
-        {/* ─── Header ────────────────────────────────────────── */}
+        {/* Header Banner */}
         <div className="bg-gradient-to-r from-emerald-700 to-emerald-800 px-6 py-8 text-center">
           <h1 className="text-2xl font-serif font-bold text-white">
             {isLogin ? 'স্বাগতম' : 'অ্যাকাউন্ট তৈরি করুন'}
@@ -44,13 +143,21 @@ const Login = () => {
           </p>
         </div>
 
-        {/* ─── Social Login ──────────────────────────────────── */}
+        {/* Social Logins */}
         <div className="px-6 pt-6">
           <div className="flex gap-3">
-            <button className="flex-1 flex items-center justify-center gap-2 bg-[#1877F2] text-white py-2.5 rounded-lg hover:bg-[#0d6bd4] transition text-sm font-medium">
+            <button
+              type="button"
+              onClick={() => handleSocialLogin(signInWithFacebook)}
+              className="flex-1 flex items-center justify-center gap-2 bg-[#1877F2] text-white py-2.5 rounded-lg hover:bg-[#0d6bd4] transition text-sm font-medium"
+            >
               <FaFacebook size={16} /> ফেসবুক
             </button>
-            <button className="flex-1 flex items-center justify-center gap-2 bg-[#DB4437] text-white py-2.5 rounded-lg hover:bg-[#c33528] transition text-sm font-medium">
+            <button
+              type="button"
+              onClick={() => handleSocialLogin(signInWithGoogle)}
+              className="flex-1 flex items-center justify-center gap-2 bg-[#DB4437] text-white py-2.5 rounded-lg hover:bg-[#c33528] transition text-sm font-medium"
+            >
               <FaGoogle size={16} /> গুগল
             </button>
           </div>
@@ -65,7 +172,7 @@ const Login = () => {
           </div>
         </div>
 
-        {/* ─── Form ──────────────────────────────────────────── */}
+        {/* Form Inputs */}
         <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-4">
           {!isLogin && (
             <div>
@@ -159,9 +266,10 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full py-3 rounded-lg bg-gradient-to-r from-emerald-700 to-emerald-800 text-white font-semibold hover:from-emerald-800 hover:to-emerald-900 transition shadow-lg shadow-emerald-700/30 hover:shadow-xl"
+            disabled={isSubmitting}
+            className="w-full py-3 rounded-lg bg-gradient-to-r from-emerald-700 to-emerald-800 text-white font-semibold hover:from-emerald-800 hover:to-emerald-900 transition shadow-lg shadow-emerald-700/30 hover:shadow-xl disabled:opacity-50"
           >
-            {isLogin ? 'লগইন করুন' : 'অ্যাকাউন্ট তৈরি করুন'}
+            {isSubmitting ? 'প্রসেসিং হচ্ছে...' : isLogin ? 'লগইন করুন' : 'অ্যাকাউন্ট তৈরি করুন'}
           </button>
 
           <div className="text-center text-sm text-gray-500">
@@ -189,19 +297,6 @@ const Login = () => {
               </>
             )}
           </div>
-
-          {/* ─── Register Notice ────────────────────────────── */}
-          {!isLogin && (
-            <div className="mt-2 p-4 bg-emerald-50 rounded-lg border border-emerald-100 text-xs text-gray-600 leading-relaxed">
-              <p className="flex items-start gap-2">
-                <span className="text-emerald-600 mt-0.5">ℹ️</span>
-                <span>
-                  এই সাইটে রেজিস্টার করলে আপনি আপনার অর্ডার স্ট্যাটাস এবং ইতিহাস দেখতে পাবেন। 
-                  শুধুমাত্র কেনার প্রক্রিয়াটি দ্রুত ও সহজ করার জন্য প্রয়োজনীয় তথ্যই চাওয়া হবে।
-                </span>
-              </p>
-            </div>
-          )}
         </form>
       </motion.div>
     </div>

@@ -12,6 +12,8 @@ import AdminLayout from "../Admin/Components/AdminLayout";
 import AdminDashboard from "../Admin/AdminDashboard";
 import ProductList from "../Admin/Products/ProductList";
 import ProductForm from "../Admin/Products/ProductForm";
+import PrivateRoute from "../Context/PrivateRoute";
+import AdminRoute from "./AdminRoute";
 
 export const router = createBrowserRouter([
   {
@@ -32,16 +34,20 @@ export const router = createBrowserRouter([
         element: <BookDetails />,
       },
 
-
       {
         path: '/admin',
-        element: <AdminLayout />,
+        element: (
+          <PrivateRoute>
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          </PrivateRoute>
+        ),
         children: [
           {
             index: true,
             element: <Navigate to="/admin/dashboard" replace />,
           },
-
           {
             path: 'dashboard',
             element: <AdminDashboard />,
