@@ -92,7 +92,7 @@ export const BookDetails = () => {
 
         const { data } = await api.get(`/books/${id}`
         );
-console.log(id)
+
         setBook(data);
       } catch (error) {
         console.error(
@@ -554,9 +554,6 @@ console.log(id)
         </div>
       </section>
 
-      {/* ─── Related Books Section ──────────────────────────── */}
-      {book && <RelatedBooks book={book} />}
-
       {/* ─── Description Section ────────────────────────────── */}
       <section className="relative border-t border-amber-200/30 bg-gradient-to-b from-[#F1EDE5] to-[#FAF9F5] py-16">
         {/* ─── Decorative Pattern ────────────────────────── */}
@@ -677,167 +674,3 @@ const DetailRow = ({ icon, label, value, isLast = false }) => {
   );
 };
 
-// ─── Related Books Component ──────────────────────────────────
-const RelatedBooks = ({ book }) => {
-  // ─── Mock related books – replace with API call ──────────
-  const [relatedBooks, setRelatedBooks] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // ─── Fetch Related Books ──────────────────────────────────
-  useEffect(() => {
-    const fetchRelated = async () => {
-      if (!book?._id || !book?.category) return;
-
-      try {
-        const { data } = await api.get('/related',
-          {
-            params: {
-              category: book.category,
-              exclude: book._id,
-            },
-          }
-        );
-
-        setRelatedBooks(data);
-      } catch (error) {
-        console.error(
-          'Error fetching related books:',
-          error.response?.data || error.message
-        );
-
-        setRelatedBooks([]);
-      }
-    };
-
-    fetchRelated();
-  }, [book?._id, book?.category]);
-  // ─── Embla Carousel Setup ──────────────────────────────────
-  const [emblaRef, emblaApi] = useEmblaCarousel(
-    {
-      loop: true,
-      align: 'start',
-      slidesToScroll: 1,
-      breakpoints: {
-        '(min-width: 640px)': { slidesToShow: 2 },
-        '(min-width: 768px)': { slidesToShow: 3 },
-        '(min-width: 1024px)': { slidesToShow: 4 },
-        '(min-width: 1280px)': { slidesToShow: 5 },
-      },
-    },
-    [Autoplay({ delay: 4000, stopOnInteraction: true })]
-  );
-
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [scrollSnaps, setScrollSnaps] = useState([]);
-
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-    setSelectedIndex(emblaApi.selectedScrollSnap());
-  }, [emblaApi]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-    setScrollSnaps(emblaApi.scrollSnapList());
-    emblaApi.on('select', onSelect);
-    onSelect();
-    return () => emblaApi.off('select', onSelect);
-  }, [emblaApi, onSelect]);
-
-  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
-  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
-
-  if (isLoading) {
-    return (
-      <section className="py-16 bg-[#FAF9F5]">
-        <div className="container mx-auto max-w-[1200px] px-4">
-          <div className="mb-8 h-8 w-48 animate-pulse rounded bg-[#E8E1D5]" />
-          <div className="flex gap-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="flex-[0_0_calc(25%-12px)]">
-                <div className="aspect-[3/4] w-full animate-pulse rounded-2xl bg-[#E8E1D5]" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (relatedBooks.length === 0) return null;
-
-  return (
-    <section className="py-16 bg-[#FAF9F5] border-t border-amber-200/30">
-      <div className="container mx-auto max-w-[1200px] px-4">
-        {/* ─── Section Header ────────────────────────────── */}
-        <div className="mb-8 flex items-center gap-4">
-          <h2 className="whitespace-nowrap font-serif text-3xl font-bold text-[#174D3B]">
-            সম্পর্কিত বই
-          </h2>
-          <span className="h-px flex-1 bg-gradient-to-r from-amber-300 to-transparent" />
-          <span className="text-amber-300/40 text-xl">◈</span>
-          <Link to="/books" className="text-sm font-medium text-amber-600 hover:underline">
-            সব দেখুন →
-          </Link>
-        </div>
-
-        {/* ─── Carousel ────────────────────────────────────── */}
-        <div className="relative">
-          <div className="overflow-hidden" ref={emblaRef}>
-            <div className="flex gap-5">
-              {relatedBooks.map((book) => (
-                <div
-                  key={book._id}
-                  className="min-w-0 flex-[0_0_calc(50%-10px)] sm:flex-[0_0_calc(33.333%-14px)] md:flex-[0_0_calc(25%-15px)] lg:flex-[0_0_calc(20%-16px)]"
-                >
-                  <BookCard book={book} />
-                </div>
-              ))}
-            </div>
-          </div>
-
-
-
-          {/* ─── Navigation Arrows ────────────────────────── */}
-          {relatedBooks.length > 0 && (
-            <>
-              <button
-                type="button"
-                onClick={scrollPrev}
-                className="absolute left-0 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/70 p-3 shadow-xl backdrop-blur-md border border-amber-200/30 transition hover:scale-110 hover:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
-                aria-label="Previous"
-              >
-                <ChevronRight className="h-5 w-5 rotate-180 text-amber-700" />
-              </button>
-              <button
-                type="button"
-                onClick={scrollNext}
-                className="absolute right-0 top-1/2 z-10 translate-x-1/2 -translate-y-1/2 rounded-full bg-white/70 p-3 shadow-xl backdrop-blur-md border border-amber-200/30 transition hover:scale-110 hover:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
-                aria-label="Next"
-              >
-                <ChevronRight className="h-5 w-5 text-amber-700" />
-              </button>
-            </>
-          )}
-        </div>
-
-        {/* ─── Pagination ──────────────────────────────────── */}
-        {relatedBooks.length > 0 && (
-          <div className="mt-6 flex justify-center gap-2">
-            {scrollSnaps.map((_, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={() => emblaApi?.scrollTo(index)}
-                className={`transition-all duration-500 rounded-full ${index === selectedIndex
-                  ? 'w-10 h-2 bg-gradient-to-r from-amber-500 to-emerald-600 shadow-md'
-                  : 'w-2 h-2 bg-gray-300 hover:bg-gray-400'
-                  }`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    </section>
-  );
-};

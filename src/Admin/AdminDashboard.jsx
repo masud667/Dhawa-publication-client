@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router';
 import { motion } from 'framer-motion';
 import {
     BookOpen,
@@ -8,7 +9,6 @@ import {
     TrendingUp,
     ArrowUpRight,
 } from 'lucide-react';
-import axios from 'axios';
 import api from '../api/axios';
 
 const AdminDashboard = () => {
@@ -18,43 +18,54 @@ const AdminDashboard = () => {
         totalUsers: 0,
         totalReviews: 0,
     });
-
+    const [recentOrders, setRecentOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
     // ==========================================
-    // FETCH DASHBOARD STATS
+    // FETCH DASHBOARD DATA
     // ==========================================
     useEffect(() => {
-        const fetchStats = async () => {
+        let isMounted = true;
+
+        const fetchDashboardData = async () => {
             try {
-                const { data } = await api.get("/admin/stats");
+                // Fetch stats and recent orders in parallel
+                const [statsRes, ordersRes] = await Promise.allSettled([
+                    api.get('/admin/stats'),
 
-                setStats({
-                    totalBooks: data.totalBooks || 0,
-                    totalOrders: data.totalOrders || 0,
-                    totalUsers: data.totalUsers || 0,
-                    totalReviews: data.totalReviews || 0,
-                });
+                ]);
+
+                if (isMounted) {
+                    if (statsRes.status === 'fulfilled' && statsRes.value?.data) {
+                        const data = statsRes.value.data;
+                        setStats({
+                            totalBooks: data.totalBooks || 0,
+                            totalOrders: data.totalOrders || 0,
+                            totalUsers: data.totalUsers || 0,
+                            totalReviews: data.totalReviews || 0,
+                        });
+                    }
+
+                    if (ordersRes.status === 'fulfilled' && Array.isArray(ordersRes.value?.data)) {
+                        setRecentOrders(ordersRes.value.data);
+                    }
+                }
             } catch (error) {
-                console.error('Error fetching dashboard stats:', error);
-
-                // Keep dashboard working even if API isn't created yet
-                setStats({
-                    totalBooks: 0,
-                    totalOrders: 0,
-                    totalUsers: 0,
-                    totalReviews: 0,
-                });
+                console.error('Error fetching dashboard data:', error);
             } finally {
-                setLoading(false);
+                if (isMounted) setLoading(false);
             }
         };
 
-        fetchStats();
+        fetchDashboardData();
+
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     // ==========================================
-    // STAT CARDS
+    // STAT CARDS CONFIG
     // ==========================================
     const cards = [
         {
@@ -93,7 +104,6 @@ const AdminDashboard = () => {
 
     return (
         <div className="space-y-8">
-
             {/* ==========================================
                 PAGE HEADER
             ========================================== */}
@@ -102,13 +112,12 @@ const AdminDashboard = () => {
                     <h1 className="text-2xl md:text-3xl font-bold text-[#174D3B]">
                         Dashboard
                     </h1>
-
                     <p className="mt-1 text-sm text-gray-500">
                         Welcome back! Here's what's happening with Dhawa Publication.
                     </p>
                 </div>
 
-                <div className="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 px-4 py-2 rounded-full">
+                <div className="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 px-4 py-2 rounded-full w-fit">
                     <TrendingUp className="w-4 h-4" />
                     <span>Store Overview</span>
                 </div>
@@ -118,7 +127,6 @@ const AdminDashboard = () => {
                 STAT CARDS
             ========================================== */}
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-
                 {cards.map((card, index) => {
                     const Icon = card.icon;
 
@@ -134,7 +142,6 @@ const AdminDashboard = () => {
                             className={`bg-white rounded-2xl p-5 md:p-6 shadow-sm border ${card.border} hover:shadow-md transition-shadow`}
                         >
                             <div className="flex items-start justify-between">
-
                                 <div>
                                     <p className="text-sm font-medium text-gray-500">
                                         {card.title}
@@ -157,9 +164,7 @@ const AdminDashboard = () => {
                                 <div
                                     className={`h-12 w-12 md:h-14 md:w-14 rounded-2xl ${card.iconBg} flex items-center justify-center`}
                                 >
-                                    <Icon
-                                        className={`h-6 w-6 md:h-7 md:w-7 ${card.iconColor}`}
-                                    />
+                                    <Icon className={`h-6 w-6 md:h-7 md:w-7 ${card.iconColor}`} />
                                 </div>
                             </div>
                         </motion.div>
@@ -176,9 +181,8 @@ const AdminDashboard = () => {
                 </h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-
-                    <a
-                        href="/admin/books/create"
+                    <Link
+                        to="/admin/books/create"
                         className="group bg-white border border-amber-200/30 rounded-2xl p-5 shadow-sm hover:shadow-md transition"
                     >
                         <div className="flex items-center justify-between">
@@ -191,7 +195,6 @@ const AdminDashboard = () => {
                                     <h3 className="font-semibold text-gray-800">
                                         Add New Book
                                     </h3>
-
                                     <p className="text-xs text-gray-500 mt-1">
                                         Add a book to your store
                                     </p>
@@ -200,10 +203,10 @@ const AdminDashboard = () => {
 
                             <ArrowUpRight className="w-5 h-5 text-gray-400 group-hover:text-emerald-600 transition" />
                         </div>
-                    </a>
+                    </Link>
 
-                    <a
-                        href="/admin/books"
+                    <Link
+                        to="/admin/books"
                         className="group bg-white border border-amber-200/30 rounded-2xl p-5 shadow-sm hover:shadow-md transition"
                     >
                         <div className="flex items-center justify-between">
@@ -216,7 +219,6 @@ const AdminDashboard = () => {
                                     <h3 className="font-semibold text-gray-800">
                                         Manage Books
                                     </h3>
-
                                     <p className="text-xs text-gray-500 mt-1">
                                         View and manage all books
                                     </p>
@@ -225,10 +227,10 @@ const AdminDashboard = () => {
 
                             <ArrowUpRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition" />
                         </div>
-                    </a>
+                    </Link>
 
-                    <a
-                        href="/admin/orders"
+                    <Link
+                        to="/admin/orders"
                         className="group bg-white border border-amber-200/30 rounded-2xl p-5 shadow-sm hover:shadow-md transition"
                     >
                         <div className="flex items-center justify-between">
@@ -241,7 +243,6 @@ const AdminDashboard = () => {
                                     <h3 className="font-semibold text-gray-800">
                                         View Orders
                                     </h3>
-
                                     <p className="text-xs text-gray-500 mt-1">
                                         Manage customer orders
                                     </p>
@@ -250,7 +251,7 @@ const AdminDashboard = () => {
 
                             <ArrowUpRight className="w-5 h-5 text-gray-400 group-hover:text-amber-600 transition" />
                         </div>
-                    </a>
+                    </Link>
                 </div>
             </div>
 
@@ -258,45 +259,76 @@ const AdminDashboard = () => {
                 RECENT ORDERS
             ========================================== */}
             <div className="bg-white rounded-2xl shadow-sm border border-amber-200/30 overflow-hidden">
-
                 <div className="flex items-center justify-between px-5 md:px-6 py-5 border-b border-gray-100">
                     <div>
                         <h2 className="text-lg font-semibold text-[#174D3B]">
                             Recent Orders
                         </h2>
-
                         <p className="text-xs text-gray-500 mt-1">
                             Latest customer orders
                         </p>
                     </div>
 
-                    <a
-                        href="/admin/orders"
+                    <Link
+                        to="/admin/orders"
                         className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
                     >
                         View All
-                    </a>
+                    </Link>
                 </div>
 
                 <div className="p-6">
-                    <div className="flex flex-col items-center justify-center py-12 text-center">
-
-                        <div className="w-16 h-16 rounded-2xl bg-emerald-50 flex items-center justify-center mb-4">
-                            <ShoppingBag className="w-7 h-7 text-emerald-600" />
+                    {loading ? (
+                        <div className="space-y-4">
+                            {[1, 2, 3].map((n) => (
+                                <div key={n} className="h-12 bg-gray-100 rounded-lg animate-pulse" />
+                            ))}
                         </div>
+                    ) : recentOrders.length > 0 ? (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm text-gray-600">
+                                <thead className="bg-gray-50 text-xs uppercase text-gray-500">
+                                    <tr>
+                                        <th className="py-3 px-4">Order ID</th>
+                                        <th className="py-3 px-4">Customer</th>
+                                        <th className="py-3 px-4">Amount</th>
+                                        <th className="py-3 px-4">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {recentOrders.map((order) => (
+                                        <tr key={order._id || order.id} className="border-b border-gray-100 hover:bg-gray-50">
+                                            <td className="py-3 px-4 font-medium text-gray-800">#{order._id?.slice(-6) || order.id}</td>
+                                            <td className="py-3 px-4">{order.user?.name || order.customerName || 'N/A'}</td>
+                                            <td className="py-3 px-4">${order.totalAmount || order.price || 0}</td>
+                                            <td className="py-3 px-4">
+                                                <span className="px-2.5 py-1 text-xs rounded-full bg-emerald-100 text-emerald-700">
+                                                    {order.status || 'Completed'}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center py-12 text-center">
+                            <div className="w-16 h-16 rounded-2xl bg-emerald-50 flex items-center justify-center mb-4">
+                                <ShoppingBag className="w-7 h-7 text-emerald-600" />
+                            </div>
 
-                        <h3 className="font-semibold text-gray-700">
-                            No recent orders
-                        </h3>
+                            <h3 className="font-semibold text-gray-700">
+                                No recent orders
+                            </h3>
 
-                        <p className="text-sm text-gray-500 mt-1 max-w-sm">
-                            Recent customer orders will appear here once customers
-                            start placing orders.
-                        </p>
-                    </div>
+                            <p className="text-sm text-gray-500 mt-1 max-w-sm">
+                                Recent customer orders will appear here once customers
+                                start placing orders.
+                            </p>
+                        </div>
+                    )}
                 </div>
             </div>
-
         </div>
     );
 };

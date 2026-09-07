@@ -10,11 +10,17 @@ export const socialLinks = [
 export const menuItems = [
   { id: 'home', label: 'হোম', path: '/' },
   { id: 'books', label: 'বই', path: '/books' },
-  // { id: 'publish-book', label: 'প্রকাশনা', path: '/publish-book' },
-  // { id: 'categories', label: 'বিষয়', path: '/categories' },
-  // { id: 'novel', label: 'উপন্যাস', path: '/novel' },
   { id: 'about', label: 'আমাদের সম্পর্কে', path: '/about' },
 ];
+
+// Admin Navigation (Home points to /admin/dashboard)
+export const adminMenuItems = [
+  { id: 'dashboard', label: 'ড্যাশবোর্ড', path: '/admin/dashboard' },
+  { id: 'manage-books', label: 'বই ব্যবস্থাপনা', path: '/admin/books' },
+  { id: 'orders', label: 'অর্ডারসমূহ', path: '/admin/orders' },
+  { id: 'users', label: 'ইউজারসমূহ', path: '/admin/users' },
+];
+
 
 export const contactInfo = {
   phone: '+880 1234 567890',

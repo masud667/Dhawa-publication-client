@@ -27,29 +27,43 @@ const Login = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  // Helper function: Generates JWT token from Express server & saves to localStorage
+  const saveJwtToken = async (email) => {
+    try {
+      const jwtRes = await AuthSecureAxios.post('/jwt', { email });
+      if (jwtRes.data?.token) {
+        localStorage.setItem('access-token', jwtRes.data.token);
+      } else {
+        console.warn("JWT token was not returned from server.");
+      }
+    } catch (err) {
+      console.error("Failed to generate JWT token:", err.message);
+    }
+  };
+
+  // Helper function: Checks if logged in user is Admin and redirects accordingly
   const handleRedirectAfterLogin = async (userEmail) => {
     try {
       if (userEmail) {
-        // 1. Call backend admin verification route
+        // Call backend admin verification route
         const res = await AuthSecureAxios.get(`/users/admin/${userEmail}`);
 
-
-
-        // 2. Check if server confirmed admin status
+        // Check if server confirmed admin status
         if (res.data && res.data.admin === true) {
-
           navigate('/admin/dashboard', { replace: true });
-          return; // Stop execution so it doesn't navigate to home
+          return;
         }
       }
     } catch (err) {
       console.warn("Admin check error:", err.message);
     }
 
-    // Fallback for regular customer users
-    console.log("Redirecting regular user to:", from);
+    // Fallback redirect for regular customer users
     navigate(from, { replace: true });
   };
+
+  // Handle Email / Password Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     const cleanEmail = formData.email.trim();
@@ -63,14 +77,36 @@ const Login = () => {
 
     try {
       if (isLogin) {
+        // 1. Firebase Email/Password Auth
         const result = await logIn(cleanEmail, formData.password);
+        const email = result.user?.email || cleanEmail;
+
+        // 2. Fetch and store JWT token in localStorage
+        await saveJwtToken(email);
+
         toast.success('সফলভাবে লগইন করা হয়েছে!');
-        await handleRedirectAfterLogin(result.user?.email || cleanEmail);
+
+        // 3. Admin Check & Redirect
+        await handleRedirectAfterLogin(email);
       } else {
+        // 1. Create New Firebase User
         const result = await createUser(cleanEmail, formData.password);
         await updateUserProfile(formData.fullName, '');
+        const email = result.user?.email || cleanEmail;
+
+        // 2. Save user record to MongoDB database
+        await AuthSecureAxios.post('/users', {
+          name: formData.fullName,
+          email: email,
+        });
+
+        // 3. Fetch and store JWT token in localStorage
+        await saveJwtToken(email);
+
         toast.success('অ্যাকাউন্ট সফলভাবে তৈরি করা হয়েছে!');
-        await handleRedirectAfterLogin(result.user?.email || cleanEmail);
+
+        // 4. Admin Check & Redirect
+        await handleRedirectAfterLogin(email);
       }
     } catch (err) {
       console.error("Auth Error:", err.code, err.message);
@@ -88,19 +124,19 @@ const Login = () => {
     }
   };
 
-
-  const handleSocialLogin = async () => {
+  // Handle Social Authentication (Google / Facebook)
+  const handleSocialLogin = async (socialSignInMethod) => {
     try {
-      // 1. Authenticate with Google
-      const result = await signInWithGoogle();
+      // 1. Social Provider Sign In
+      const result = await socialSignInMethod();
       const user = result.user;
 
       if (!user?.email) {
-        console.error("Google authentication failed: No email returned.");
+        console.error("Social authentication failed: No email returned.");
         return;
       }
 
-      // 2. Save/Sync User to MongoDB Database
+      // 2. Sync user data to MongoDB database
       const userData = {
         name: user.displayName || "",
         email: user.email,
@@ -108,22 +144,17 @@ const Login = () => {
       };
       await AuthSecureAxios.post('/users', userData);
 
-      // 3. Issue and Store JWT Token
-      const jwtRes = await AuthSecureAxios.post('/jwt', { email: user.email });
-      if (jwtRes.data?.token) {
-        localStorage.setItem('access-token', jwtRes.data.token);
-      } else {
-        console.warn("JWT token was not returned from server.");
-      }
+      // 3. Fetch and store JWT token in localStorage
+      await saveJwtToken(user.email);
 
-      // 4. Verify Admin status & Redirect
+      // 4. Admin Check & Redirect
       await handleRedirectAfterLogin(user.email);
 
     } catch (error) {
       console.error("❌ Social Login failed:", error.response?.data || error.message);
+      toast.error('সামাজিক যোগাযোগ মাধ্যমে লগইন করতে ব্যর্থ হয়েছে।');
     }
   };
-
 
   return (
     <div className="min-h-screen bg-[#FAF9F5] flex items-center justify-center px-4 py-12">
@@ -249,7 +280,7 @@ const Login = () => {
 
           {isLogin && (
             <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 text-sm text-gray-600">
+              <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={rememberMe}

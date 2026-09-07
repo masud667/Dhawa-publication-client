@@ -14,6 +14,8 @@ import ProductList from "../Admin/Products/ProductList";
 import ProductForm from "../Admin/Products/ProductForm";
 import PrivateRoute from "../Context/PrivateRoute";
 import AdminRoute from "./AdminRoute";
+import AboutUs from "../Pages/About/AboutUs";
+import OrderDashboard from "../Admin/Order/OrderDashboard";
 
 export const router = createBrowserRouter([
   {
@@ -29,6 +31,7 @@ export const router = createBrowserRouter([
       { path: 'checkout', element: <Checkout /> },
       { path: 'books', element: <Books /> },
       { path: 'categories', element: <Subjects /> },
+      { path: 'about', element: <AboutUs /> },
       {
         path: '/books/:id',
         element: <BookDetails />,
@@ -61,6 +64,10 @@ export const router = createBrowserRouter([
           {
             path: 'books/create',
             element: <ProductForm />,
+          },
+          {
+            path: 'orders',
+            element: <OrderDashboard />,
           },
 
           {

@@ -1,5 +1,5 @@
 // src/Pages/Checkout/Checkout.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -289,13 +289,12 @@ const Checkout = () => {
           {STEPS.map((step, index) => (
             <div key={step.id} className="flex flex-1 items-center gap-2">
               <div
-                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold transition-all duration-300 ${
-                  index < currentStep
-                    ? 'bg-emerald-600 text-white'
-                    : index === currentStep
+                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold transition-all duration-300 ${index < currentStep
+                  ? 'bg-emerald-600 text-white'
+                  : index === currentStep
                     ? 'bg-emerald-600 text-white ring-4 ring-emerald-200'
                     : 'bg-gray-200 text-gray-400'
-                }`}
+                  }`}
               >
                 {index < currentStep ? <Check className="h-5 w-5" /> : index + 1}
               </div>
@@ -304,13 +303,12 @@ const Checkout = () => {
                   {step.label}
                 </p>
                 <div
-                  className={`mt-1 h-1 rounded-full transition-all duration-500 ${
-                    index < currentStep
-                      ? 'bg-emerald-600'
-                      : index === currentStep
+                  className={`mt-1 h-1 rounded-full transition-all duration-500 ${index < currentStep
+                    ? 'bg-emerald-600'
+                    : index === currentStep
                       ? 'bg-emerald-200'
                       : 'bg-gray-200'
-                  }`}
+                    }`}
                 />
               </div>
               {index < STEPS.length - 1 && (
@@ -464,9 +462,8 @@ const AddressStep = ({
                 name={`${prefix}.fullName`}
                 value={data.fullName || ''}
                 onChange={onChange}
-                className={`w-full rounded-lg border ${
-                  err.fullName ? 'border-red-500' : 'border-gray-200'
-                } pl-10 pr-3 py-2.5 text-gray-800 placeholder-gray-400 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200`}
+                className={`w-full rounded-lg border ${err.fullName ? 'border-red-500' : 'border-gray-200'
+                  } pl-10 pr-3 py-2.5 text-gray-800 placeholder-gray-400 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200`}
                 placeholder="আপনার নাম"
               />
             </div>
@@ -483,9 +480,8 @@ const AddressStep = ({
                 name={`${prefix}.email`}
                 value={data.email || ''}
                 onChange={onChange}
-                className={`w-full rounded-lg border ${
-                  err.email ? 'border-red-500' : 'border-gray-200'
-                } pl-10 pr-3 py-2.5 text-gray-800 placeholder-gray-400 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200`}
+                className={`w-full rounded-lg border ${err.email ? 'border-red-500' : 'border-gray-200'
+                  } pl-10 pr-3 py-2.5 text-gray-800 placeholder-gray-400 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200`}
                 placeholder="your@email.com"
               />
             </div>
@@ -504,9 +500,8 @@ const AddressStep = ({
               name={`${prefix}.phone`}
               value={data.phone || ''}
               onChange={onChange}
-              className={`w-full rounded-lg border ${
-                err.phone ? 'border-red-500' : 'border-gray-200'
-              } pl-10 pr-3 py-2.5 text-gray-800 placeholder-gray-400 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200`}
+              className={`w-full rounded-lg border ${err.phone ? 'border-red-500' : 'border-gray-200'
+                } pl-10 pr-3 py-2.5 text-gray-800 placeholder-gray-400 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200`}
               placeholder="018XXXXXXXX"
             />
           </div>
@@ -524,9 +519,8 @@ const AddressStep = ({
               rows={2}
               value={data.address || ''}
               onChange={onChange}
-              className={`w-full rounded-lg border ${
-                err.address ? 'border-red-500' : 'border-gray-200'
-              } pl-10 pr-3 py-2.5 text-gray-800 placeholder-gray-400 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200`}
+              className={`w-full rounded-lg border ${err.address ? 'border-red-500' : 'border-gray-200'
+                } pl-10 pr-3 py-2.5 text-gray-800 placeholder-gray-400 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200`}
               placeholder="আপনার সম্পূর্ণ ঠিকানা"
             />
           </div>
@@ -544,9 +538,8 @@ const AddressStep = ({
                 name={`${prefix}.district`}
                 value={data.district || ''}
                 onChange={onChange}
-                className={`w-full rounded-lg border ${
-                  err.district ? 'border-red-500' : 'border-gray-200'
-                } appearance-none bg-white pl-10 pr-8 py-2.5 text-gray-800 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200`}
+                className={`w-full rounded-lg border ${err.district ? 'border-red-500' : 'border-gray-200'
+                  } appearance-none bg-white pl-10 pr-8 py-2.5 text-gray-800 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200`}
               >
                 <option value="">জেলা নির্বাচন করুন</option>
                 {districts.map((district) => (
@@ -574,9 +567,8 @@ const AddressStep = ({
                 name={`${prefix}.postCode`}
                 value={data.postCode || ''}
                 onChange={onChange}
-                className={`w-full rounded-lg border ${
-                  err.postCode ? 'border-red-500' : 'border-gray-200'
-                } pl-10 pr-3 py-2.5 text-gray-800 placeholder-gray-400 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200`}
+                className={`w-full rounded-lg border ${err.postCode ? 'border-red-500' : 'border-gray-200'
+                  } pl-10 pr-3 py-2.5 text-gray-800 placeholder-gray-400 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200`}
                 placeholder="ম্যানুয়ালি লিখুন"
               />
             </div>
@@ -658,11 +650,10 @@ const PaymentStep = ({ formData, onChange }) => {
         {paymentMethods.map((method) => (
           <label
             key={method.id}
-            className={`flex cursor-pointer items-start gap-4 rounded-xl border p-4 transition ${
-              formData.paymentMethod === method.id
-                ? 'border-emerald-500 bg-emerald-50/50 ring-2 ring-emerald-200'
-                : 'border-gray-200 hover:border-emerald-200'
-            }`}
+            className={`flex cursor-pointer items-start gap-4 rounded-xl border p-4 transition ${formData.paymentMethod === method.id
+              ? 'border-emerald-500 bg-emerald-50/50 ring-2 ring-emerald-200'
+              : 'border-gray-200 hover:border-emerald-200'
+              }`}
           >
             <input
               type="radio"
@@ -710,6 +701,8 @@ const ConfirmationStep = ({
   paymentMethod,
   orderNotes,
 }) => {
+  const isSavedRef = useRef(false);
+
   const orderDate = new Date().toLocaleString('bn-BD', {
     year: 'numeric',
     month: 'long',
@@ -724,6 +717,58 @@ const ConfirmationStep = ({
     sslcommerz: 'SSLCommerz',
   };
 
+  // POST Order to DB on Mount
+  useEffect(() => {
+    if (!orderNumber || isSavedRef.current) return;
+
+    const saveOrderToDB = async () => {
+      try {
+        const orderData = {
+          orderNumber,
+          orderDate,
+          items,
+          billingAddress,
+          shippingAddress,
+          subtotal,
+          shippingCost,
+          grandTotal,
+          paymentMethod,
+          orderNotes,
+          status: 'Pending',
+        };
+
+        const response = await fetch('http://localhost:5000/api/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(orderData),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to save order to database');
+        }
+
+        isSavedRef.current = true;
+      } catch (error) {
+        console.error('Error storing order in DB:', error);
+      }
+    };
+
+    saveOrderToDB();
+  }, [
+    orderNumber,
+    orderDate,
+    items,
+    billingAddress,
+    shippingAddress,
+    subtotal,
+    shippingCost,
+    grandTotal,
+    paymentMethod,
+    orderNotes,
+  ]);
+
   const handlePrint = () => {
     window.print();
   };
@@ -732,25 +777,24 @@ const ConfirmationStep = ({
 
   return (
     <div className="space-y-6">
-      {/* ─── Success Icon ────────────────────────────────────── */}
+      {/* ─── Success Header ───────────────────────────────────── */}
       <div className="text-center">
         <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100">
           <Check className="h-10 w-10 text-emerald-600" />
         </div>
-        <h2 className="font-serif text-2xl font-bold text-[#174D3B]">অর্ডার সম্পন্ন হয়েছে!</h2>
-        <p className="mt-1 text-gray-500">আপনার অর্ডারটি সফলভাবে প্লেস করা হয়েছে।</p>
+        <h2 className="font-serif text-2xl font-bold text-[#174D3B]">অর্ডার সম্পন্ন হয়েছে!</h2>
+        <p className="mt-1 text-gray-500">আপনার অর্ডারটি সফলভাবে প্লেস করা হয়েছে।</p>
       </div>
 
-      {/* ─── Cash Memo / Receipt ────────────────────────────── */}
+      {/* ─── Order Summary Card ─────────────────────────────── */}
       <div className="rounded-2xl border border-amber-200/30 bg-white p-6 shadow-lg print:shadow-none md:p-8">
         <div className="space-y-6">
-          {/* ─── Header ────────────────────────────────────────── */}
           <div className="flex flex-wrap items-center justify-between border-b border-amber-200/30 pb-4">
             <div>
               <h3 className="font-serif text-xl font-bold text-[#174D3B]">
-                ধাওয়া পাবলিকেশন
+                ধাওয়া পাবলিকেশন
               </h3>
-              <p className="text-xs text-gray-400">ইসলামিক বইয়ের দোকান</p>
+              <p className="text-xs text-gray-400">ইসলামিক বইয়ের দোকান</p>
             </div>
             <div className="text-right">
               <p className="text-sm font-semibold text-[#174D3B]">অর্ডার নম্বর</p>
@@ -759,7 +803,7 @@ const ConfirmationStep = ({
             </div>
           </div>
 
-          {/* ─── Customer Info ────────────────────────────────── */}
+          {/* Customer Details */}
           <div className="grid grid-cols-1 gap-4 border-b border-amber-200/30 pb-4 md:grid-cols-2">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
@@ -776,7 +820,7 @@ const ConfirmationStep = ({
                   <p className="text-sm text-gray-600">{billingAddress.email || 'N/A'}</p>
                 </>
               ) : (
-                <p className="text-sm text-gray-500">ঠিকানা পাওয়া যায়নি</p>
+                <p className="text-sm text-gray-500">ঠিকানা পাওয়া যায়নি</p>
               )}
             </div>
             <div>
@@ -799,7 +843,7 @@ const ConfirmationStep = ({
             </div>
           </div>
 
-          {/* ─── Payment Method ────────────────────────────────── */}
+          {/* Payment Method */}
           <div className="border-b border-amber-200/30 pb-4">
             <div className="flex flex-wrap items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
@@ -819,7 +863,7 @@ const ConfirmationStep = ({
             )}
           </div>
 
-          {/* ─── Items List ────────────────────────────────────── */}
+          {/* Items */}
           <div className="border-b border-amber-200/30 pb-4">
             <h4 className="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-400">
               অর্ডারকৃত আইটেমসমূহ
@@ -846,11 +890,11 @@ const ConfirmationStep = ({
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-500">কোনো আইটেম পাওয়া যায়নি</p>
+              <p className="text-sm text-gray-500">কোনো আইটেম পাওয়া যায়নি</p>
             )}
           </div>
 
-          {/* ─── Total Summary ────────────────────────────────── */}
+          {/* Totals */}
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">সাবটোটাল</span>
@@ -868,16 +912,7 @@ const ConfirmationStep = ({
             </div>
           </div>
 
-          {/* ─── Thank You Message ────────────────────────────── */}
-          <div className="mt-4 rounded-xl bg-emerald-50/50 p-4 text-center border border-emerald-100">
-            <p className="text-sm text-emerald-800">
-              আপনার অর্ডারের ডিটেইলস সহ একটি কনফার্মেশন ইমেইল পাঠানো হয়েছে।
-              <br />
-              আপনি আপনার অ্যাকাউন্টে লগইন করে অর্ডার ট্র্যাক করতে পারবেন।
-            </p>
-          </div>
-
-          {/* ─── Action Buttons ────────────────────────────────── */}
+          {/* Actions */}
           <div className="no-print flex flex-wrap justify-center gap-4 pt-2">
             <Link
               to="/"
