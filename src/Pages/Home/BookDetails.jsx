@@ -309,6 +309,13 @@ export const BookDetails = () => {
                 </p>
               )}
 
+              {/* ─── Author ───────────────────────────────── */}
+              {book.converter && (
+                <p className="mt-3 text-sm font-medium text-[#5D655F]">
+                  <span className="text-amber-600">অনুবাদক:</span> {book.converter}
+                </p>
+              )}
+
               {/* ─── Price ────────────────────────────────── */}
               <div className="mt-5 flex flex-wrap items-center gap-4">
                 {price > discountPrice && (

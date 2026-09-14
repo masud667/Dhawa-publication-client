@@ -37,13 +37,13 @@ const Home = () => {
           api.get("/home/children"),
         ]);
 
-        setRecentBooks(recent.data);
-        setPopularBooks(popular.data);
-        setMuslimLifeBooks(muslim.data);
-        setWomenBooks(women.data);
-        setSelfPurificationBooks(self.data);
-        setTalimBooks(talim.data);
-        setChildrenBooks(children.data);
+        setRecentBooks(recent.data || []);
+        setPopularBooks(popular.data || []);
+        setMuslimLifeBooks(muslim.data || []);
+        setWomenBooks(women.data || []);
+        setSelfPurificationBooks(self.data || []);
+        setTalimBooks(talim.data || []);
+        setChildrenBooks(children.data || []);
       } catch (error) {
         console.error("❌ Error fetching home data:", error);
       } finally {
@@ -56,64 +56,78 @@ const Home = () => {
 
   return (
     <div>
+      <Banner />
 
-      <Banner></Banner>
-      {/* ─── Recent Books (existing) ──────────────────────────── */}
-      <RecentBooks books={recentBooks} isLoading={loading} />
+      {/* ─── Recent Books ──────────────────────────── */}
+      {(loading || (recentBooks && recentBooks.length > 0)) && (
+        <RecentBooks books={recentBooks} isLoading={loading} />
+      )}
 
       {/* ─── পাঠকপ্রিয় বই ────────────────────────────────────── */}
-      <BookSection
-        title="পাঠকপ্রিয় বই"
-        books={popularBooks}
-        isLoading={loading}
-        seeAllLink="/category/popular"
-        seeAllLabel="সব দেখুন"
-      />
+      {(loading || (popularBooks && popularBooks.length > 0)) && (
+        <BookSection
+          title="পাঠকপ্রিয় বই"
+          books={popularBooks}
+          isLoading={loading}
+          seeAllLink="/category/popular"
+          seeAllLabel="সব দেখুন"
+        />
+      )}
 
       {/* ─── মুসলিম জীবন রচিত ──────────────────────────────── */}
-      <BookSection
-        title="মুসলিম জীবন রচিত"
-        books={muslimLifeBooks}
-        isLoading={loading}
-        seeAllLink="/category/muslim-life"
-        seeAllLabel="সব দেখুন"
-      />
+      {(loading || (muslimLifeBooks && muslimLifeBooks.length > 0)) && (
+        <BookSection
+          title="মুসলিম জীবন রচিত"
+          books={muslimLifeBooks}
+          isLoading={loading}
+          seeAllLink="/category/muslim-life"
+          seeAllLabel="সব দেখুন"
+        />
+      )}
 
       {/* ─── নারীদের নির্বাচিত বই ──────────────────────────── */}
-      <BookSection
-        title="নারীদের নির্বাচিত বই"
-        books={womenBooks}
-        isLoading={loading}
-        seeAllLink="/category/women"
-        seeAllLabel="সব দেখুন"
-      />
+      {(loading || (womenBooks && womenBooks.length > 0)) && (
+        <BookSection
+          title="নারীদের নির্বাচিত বই"
+          books={womenBooks}
+          isLoading={loading}
+          seeAllLink="/category/women"
+          seeAllLabel="সব দেখুন"
+        />
+      )}
 
       {/* ─── আমল ও আত্মশুদ্ধির বই ──────────────────────────── */}
-      <BookSection
-        title="আমল ও আত্মশুদ্ধির বই"
-        books={selfPurificationBooks}
-        isLoading={loading}
-        seeAllLink="/category/self-purification"
-        seeAllLabel="সব দেখুন"
-      />
+      {(loading || (selfPurificationBooks && selfPurificationBooks.length > 0)) && (
+        <BookSection
+          title="আমল ও আত্মশুদ্ধির বই"
+          books={selfPurificationBooks}
+          isLoading={loading}
+          seeAllLink="/category/self-purification"
+          seeAllLabel="সব দেখুন"
+        />
+      )}
 
       {/* ─── তালীমের বই ────────────────────────────────────── */}
-      <BookSection
-        title="তালীমের বই"
-        books={talimBooks}
-        isLoading={loading}
-        seeAllLink="/category/talim"
-        seeAllLabel="সব দেখুন"
-      />
+      {(loading || (talimBooks && talimBooks.length > 0)) && (
+        <BookSection
+          title="তালীমের বই"
+          books={talimBooks}
+          isLoading={loading}
+          seeAllLink="/category/talim"
+          seeAllLabel="সব দেখুন"
+        />
+      )}
 
       {/* ─── ছোটদের প্রিয় বই ────────────────────────────────── */}
-      <BookSection
-        title="ছোটদের প্রিয় বই"
-        books={childrenBooks}
-        isLoading={loading}
-        seeAllLink="/category/children"
-        seeAllLabel="সব দেখুন"
-      />
+      {(loading || (childrenBooks && childrenBooks.length > 0)) && (
+        <BookSection
+          title="ছোটদের প্রিয় বই"
+          books={childrenBooks}
+          isLoading={loading}
+          seeAllLink="/category/children"
+          seeAllLabel="সব দেখুন"
+        />
+      )}
     </div>
   );
 };

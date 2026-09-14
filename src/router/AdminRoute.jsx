@@ -1,27 +1,50 @@
-// src/Routes/AdminRoute.jsx
-import { useContext } from "react";
-import { Navigate, useLocation } from "react-router";
-import { AuthContext } from "../Context/AuthContext";
+import React, { useContext, useEffect, useState } from 'react';
+import { Navigate, useLocation } from 'react-router';
+import { AuthContext } from '../Context/AuthContext';
+import AuthSecureAxios from '../Hook/AuthSecureAxios';
 
 const AdminRoute = ({ children }) => {
-    const { user, isAdmin, loading, isAdminLoading } = useContext(AuthContext);
+    const { user, loading } = useContext(AuthContext);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [isAdminLoading, setIsAdminLoading] = useState(true);
     const location = useLocation();
 
-    // 1. Wait until BOTH Firebase user and Admin API checks are finished
+    useEffect(() => {
+        const checkAdminStatus = async () => {
+            if (user?.email) {
+                try {
+                    const res = await AuthSecureAxios.get(`/users/admin/${user.email}`);
+                    setIsAdmin(res.data?.admin === true);
+                } catch (err) {
+                    console.error("Failed to verify admin:", err);
+                    setIsAdmin(false);
+                } finally {
+                    setIsAdminLoading(false);
+                }
+            } else {
+                setIsAdminLoading(false);
+            }
+        };
+
+        if (!loading) {
+            checkAdminStatus();
+        }
+    }, [user, loading]);
+
     if (loading || isAdminLoading) {
         return (
-            <div className="flex justify-center items-center h-screen">
-                <span className="loading loading-spinner loading-lg text-primary"></span>
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-600"></div>
             </div>
         );
     }
 
-    // 2. Allow entry only if user exists AND is confirmed admin
+    // If user exists and is an admin, allow access
     if (user && isAdmin) {
         return children;
     }
 
-    // 3. Kick non-admins back to home
+    // If user is NOT an admin, redirect them back to home
     return <Navigate to="/" state={{ from: location }} replace />;
 };
 

@@ -51,7 +51,7 @@ const UserMenu = () => {
       >
         <li>
           <span className="text-xs text-gray-400 font-semibold border-b border-gray-100 pb-2 mb-1 pointer-events-none">
-            {user.displayName ? user.displayName : 'আমার অ্যাকাউন্ট'}
+            {user.email ? user.email : 'আমার অ্যাকাউন্ট'}
           </span>
         </li>
         <li>

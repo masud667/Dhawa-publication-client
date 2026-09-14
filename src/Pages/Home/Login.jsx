@@ -11,7 +11,7 @@ const Login = () => {
   const location = useLocation();
   const { logIn, createUser, signInWithGoogle, signInWithFacebook, updateUserProfile } = useContext(AuthContext);
 
-  // Target destination route (e.g., /admin/dashboard), defaulting to home '/'
+  // Target destination route (defaulting to home '/')
   const from = location.state?.from?.pathname || '/';
 
   const [isLogin, setIsLogin] = useState(true);
@@ -28,26 +28,31 @@ const Login = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Helper function: Generates JWT token from Express server & saves to localStorage
+  // Helper function: Generates JWT token from Express server, saves to localStorage, and returns it
   const saveJwtToken = async (email) => {
     try {
       const jwtRes = await AuthSecureAxios.post('/jwt', { email });
       if (jwtRes.data?.token) {
-        localStorage.setItem('access-token', jwtRes.data.token);
+        const token = jwtRes.data.token;
+        localStorage.setItem('access-token', token);
+        return token;
       } else {
         console.warn("JWT token was not returned from server.");
       }
     } catch (err) {
       console.error("Failed to generate JWT token:", err.message);
     }
+    return null;
   };
 
   // Helper function: Checks if logged in user is Admin and redirects accordingly
-  const handleRedirectAfterLogin = async (userEmail) => {
+  const handleRedirectAfterLogin = async (userEmail, token) => {
     try {
       if (userEmail) {
-        // Call backend admin verification route
-        const res = await AuthSecureAxios.get(`/users/admin/${userEmail}`);
+        // Explicitly attach token to header to prevent delay in Axios interceptor
+        const res = await AuthSecureAxios.get(`/users/admin/${userEmail}`, {
+          headers: token ? { authorization: `Bearer ${token}` } : {},
+        });
 
         // Check if server confirmed admin status
         if (res.data && res.data.admin === true) {
@@ -60,7 +65,9 @@ const Login = () => {
     }
 
     // Fallback redirect for regular customer users
-    navigate(from, { replace: true });
+    // Avoid sending standard users to admin path if they were redirected from there
+    const targetPath = from.startsWith('/admin') ? '/' : from;
+    navigate(targetPath, { replace: true });
   };
 
   // Handle Email / Password Form Submission
@@ -81,13 +88,13 @@ const Login = () => {
         const result = await logIn(cleanEmail, formData.password);
         const email = result.user?.email || cleanEmail;
 
-        // 2. Fetch and store JWT token in localStorage
-        await saveJwtToken(email);
+        // 2. Fetch and store JWT token
+        const token = await saveJwtToken(email);
 
         toast.success('সফলভাবে লগইন করা হয়েছে!');
 
         // 3. Admin Check & Redirect
-        await handleRedirectAfterLogin(email);
+        await handleRedirectAfterLogin(email, token);
       } else {
         // 1. Create New Firebase User
         const result = await createUser(cleanEmail, formData.password);
@@ -100,13 +107,13 @@ const Login = () => {
           email: email,
         });
 
-        // 3. Fetch and store JWT token in localStorage
-        await saveJwtToken(email);
+        // 3. Fetch and store JWT token
+        const token = await saveJwtToken(email);
 
         toast.success('অ্যাকাউন্ট সফলভাবে তৈরি করা হয়েছে!');
 
         // 4. Admin Check & Redirect
-        await handleRedirectAfterLogin(email);
+        await handleRedirectAfterLogin(email, token);
       }
     } catch (err) {
       console.error("Auth Error:", err.code, err.message);
@@ -144,11 +151,11 @@ const Login = () => {
       };
       await AuthSecureAxios.post('/users', userData);
 
-      // 3. Fetch and store JWT token in localStorage
-      await saveJwtToken(user.email);
+      // 3. Fetch and store JWT token
+      const token = await saveJwtToken(user.email);
 
       // 4. Admin Check & Redirect
-      await handleRedirectAfterLogin(user.email);
+      await handleRedirectAfterLogin(user.email, token);
 
     } catch (error) {
       console.error("❌ Social Login failed:", error.response?.data || error.message);
