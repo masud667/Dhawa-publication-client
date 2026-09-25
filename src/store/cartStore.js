@@ -51,7 +51,7 @@ export const useCartStore = create(
       clearCart: () => set({ items: [], totalItems: 0, totalPrice: 0 }),
     }),
     {
-      name: 'dhawa-cart-storage',
+      name: 'Dawah-cart-storage',
     }
   )
 );

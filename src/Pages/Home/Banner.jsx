@@ -15,7 +15,7 @@ const banners = [
     id: 2,
     title: "ইসলামিক বইয়ের সমৃদ্ধ সংগ্রহ",
     description:
-      "Explore authentic books from Dhawa Publication and build your personal library.",
+      "Explore authentic books from Dawah Publication and build your personal library.",
     image: "/banner-2.png",
   },
   {
@@ -129,7 +129,7 @@ function Banner() {
                     backdrop-blur-md
                     "
                   >
-                    Dhawa Publication
+                    Dawah Publication
                   </span>
 
 

@@ -15,7 +15,7 @@ const Logo = () => {
     <Link to={homeDestination} className="flex items-center gap-2">
       <img
         src="/logo.jpeg"
-        alt="dhawaPublication"
+        alt="DawahPublication"
         className="h-10 w-auto object-contain"
       />
     </Link>

@@ -85,7 +85,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
         ========================================= */}
                 <div className="p-6 border-b border-amber-200/30 flex items-center justify-between">
                     <h2 className="font-serif text-2xl font-bold text-[#174D3B]">
-                        Dhawa{' '}
+                        Dawah{' '}
                         <span className="text-emerald-700">
                             Admin
                         </span>

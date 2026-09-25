@@ -1,10 +1,21 @@
 // src/data/headerData.js
 
 export const socialLinks = [
-  { id: 'facebook', icon: 'FaFacebook', url: 'https://facebook.com' },
-  { id: 'instagram', icon: 'FaInstagram', url: 'https://instagram.com' },
-  { id: 'youtube', icon: 'FaYoutube', url: 'https://youtube.com' },
-  { id: 'twitter', icon: 'FaTwitter', url: 'https://twitter.com' },
+  {
+    id: 'facebook',
+    icon: 'FaFacebook',
+    url: 'https://facebook.com/dawahpublication1'
+  },
+  {
+    id: 'youtube',
+    icon: 'FaYoutube',
+    url: 'https://youtube.com/@DawahPublication'
+  },
+  {
+    id: 'tiktok',
+    icon: 'FaTiktok',
+    url: 'https://tiktok.com/@dawah.publication'
+  },
 ];
 
 export const menuItems = [
@@ -23,7 +34,7 @@ export const adminMenuItems = [
 
 
 export const contactInfo = {
-  phone: '+880 1234 567890',
-  email: 'info@dhawapublication.com',
-  address: 'ঢাকা, বাংলাদেশ',
+  phone: '01810-728222',
+  email: 'dawahpublicationbd@gmail.com',
+  address: '২৮ নং দোকান, ১১ ইসলামি টাওয়ার, বাংলাবাজার, ঢাকা',
 };

@@ -48,7 +48,7 @@ const Cart = () => {
   // ─── Handle promo code ──────────────────────────────────
   const handlePromoSubmit = (e) => {
     e.preventDefault();
-    if (promoCode.toLowerCase() === 'dhawa10') {
+    if (promoCode.toLowerCase() === 'Dawah10') {
       setPromoApplied(true);
       setPromoDiscount(Math.round(totalPrice * 0.1));
       setPromoCode('');
@@ -281,7 +281,7 @@ const Cart = () => {
 
                 {promoApplied && (
                   <p className="text-xs text-emerald-600">
-                    ✓ "DHAWA10" কোড প্রযোজ্য হয়েছে!
+                    ✓ "Dawah10" কোড প্রযোজ্য হয়েছে!
                   </p>
                 )}
 

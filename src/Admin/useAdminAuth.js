@@ -6,7 +6,7 @@ const useAdminAuth = () => {
 
     const [admin, setAdmin] = useState({
         name: "Development Admin",
-        email: "admin@dhawa.com",
+        email: "dawahpublicationbd@gmail.com",
         role: "admin",
     });
 
@@ -16,7 +16,7 @@ const useAdminAuth = () => {
     const loginAdmin = () => {
         setAdmin({
             name: "Development Admin",
-            email: "admin@dhawa.com",
+            email: "dawahpublicationbd@gmail.com",
             role: "admin",
         });
     };

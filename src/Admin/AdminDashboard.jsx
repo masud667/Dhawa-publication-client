@@ -113,7 +113,7 @@ const AdminDashboard = () => {
                         Dashboard
                     </h1>
                     <p className="mt-1 text-sm text-gray-500">
-                        Welcome back! Here's what's happening with Dhawa Publication.
+                        Welcome back! Here's what's happening with Dawah Publication.
                     </p>
                 </div>
 

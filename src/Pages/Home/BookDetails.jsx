@@ -20,6 +20,7 @@ import {
   Clock,
   Check,
   X,
+  ExternalLink,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -32,7 +33,26 @@ import axios from 'axios';
 import api from '../../api/axios';
 
 const FALLBACK_IMAGE =
-  'https://placehold.co/600x850/F4F0E8/174D3B?text=Dhawa+Publication';
+  'https://placehold.co/600x850/F4F0E8/174D3B?text=Dawah+Publication';
+
+const getEmbeddablePdfUrl = (url) => {
+  if (!url) return null;
+
+  // Handle Google Drive links
+  if (url.includes('drive.google.com')) {
+    // Extract file ID from various Google Drive URL formats
+    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
+
+    if (match && match[1]) {
+      const fileId = match[1];
+      // Force Google Drive's explicit preview embed URL
+      return `https://drive.google.com/file/d/${fileId}/preview`;
+    }
+  }
+
+  // Fallback for direct PDF links (Firebase, Cloudinary, standard server hosting)
+  return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+};
 
 // ─── Sample Review Data (replace with API later) ──────────
 const sampleReviews = [
@@ -83,6 +103,7 @@ export const BookDetails = () => {
 
   // ─── Modal state ────────────────────────────────────────────
   const [showPdfModal, setShowPdfModal] = useState(false);
+
   // ─── Fetch Book Data ──────────────────────────────────────
   useEffect(() => {
     const getBook = async () => {
@@ -90,8 +111,7 @@ export const BookDetails = () => {
         setIsLoading(true);
         setError('');
 
-        const { data } = await api.get(`/books/${id}`
-        );
+        const { data } = await api.get(`/books/${id}`);
 
         setBook(data);
       } catch (error) {
@@ -101,7 +121,7 @@ export const BookDetails = () => {
         );
 
         setBook(null);
-        setError('বইটির তথ্য পাওয়া যায়নি।');
+        setError('বইটির তথ্য পাওয়া যায়নি।');
       } finally {
         setIsLoading(false);
       }
@@ -112,6 +132,9 @@ export const BookDetails = () => {
     }
   }, [id]);
 
+  // ─── PDF URL Normalization ─────────────────────────────────
+  const rawPdfUrl = book?.samplePdfUrl || book?.pdfUrl;
+  const embeddablePdfUrl = getEmbeddablePdfUrl(rawPdfUrl);
 
   // ─── Buy Now (open PDF modal) ──────────────────────────────
   const handleBuyNow = () => {
@@ -184,7 +207,7 @@ export const BookDetails = () => {
           <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-emerald-100 text-5xl shadow-lg">
             📚
           </div>
-          <h2 className="mt-6 font-serif text-3xl font-bold text-[#174D3B]">বই পাওয়া যায়নি</h2>
+          <h2 className="mt-6 font-serif text-3xl font-bold text-[#174D3B]">বই পাওয়া যায়নি</h2>
           <p className="mt-3 text-gray-500">{error}</p>
           <Link
             to="/books"
@@ -309,7 +332,7 @@ export const BookDetails = () => {
                 </p>
               )}
 
-              {/* ─── Author ───────────────────────────────── */}
+              {/* ─── Converter/Translator ─────────────────── */}
               {book.converter && (
                 <p className="mt-3 text-sm font-medium text-[#5D655F]">
                   <span className="text-amber-600">অনুবাদক:</span> {book.converter}
@@ -324,7 +347,7 @@ export const BookDetails = () => {
                 <span className="text-3xl font-bold text-emerald-700">{formatPrice(discountPrice)}</span>
                 {discountPercent > 0 && (
                   <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">
-                    {discountPercent}% ছাড়
+                    {discountPercent}% ছাড়
                   </span>
                 )}
               </div>
@@ -347,7 +370,7 @@ export const BookDetails = () => {
                 />
                 <DetailRow
                   icon={<BookOpen className="h-4 w-4" />}
-                  label="বিষয়"
+                  label="বিষয়"
                   value={book.category || book.section}
                 />
                 <DetailRow
@@ -416,7 +439,6 @@ export const BookDetails = () => {
                   className="px-8"
                 />
 
-                {/* ─── Buy Now ────────────────────────────────────────── */}
                 <button
                   type="button"
                   disabled={Number(book.stock) <= 0}
@@ -426,11 +448,12 @@ export const BookDetails = () => {
                   এখনই নমুনা পড়ুন
                 </button>
               </div>
+
               {/* ─── Stock Note ───────────────────────────── */}
               {Number(book.stock) > 0 && (
                 <p className="mt-4 flex items-center gap-2 text-sm text-emerald-600">
                   <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
-                  বইটি বর্তমানে স্টকে রয়েছে
+                  বইটি বর্তমানে স্টকে রয়েছে
                 </p>
               )}
             </motion.div>
@@ -504,7 +527,7 @@ export const BookDetails = () => {
                       value={userReview}
                       onChange={(e) => setUserReview(e.target.value)}
                       className="w-full rounded-lg border border-gray-300 p-3 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
-                      placeholder="বইটি সম্পর্কে আপনার অনুভূতি শেয়ার করুন..."
+                      placeholder="বইটি সম্পর্কে আপনার অনুভূতি শেয়ার করুন..."
                     />
                   </div>
                   <button
@@ -623,21 +646,35 @@ export const BookDetails = () => {
                 <h3 className="font-serif text-xl font-bold text-[#174D3B]">
                   {book.title} – নমুনা পড়ুন
                 </h3>
-                <button
-                  onClick={() => setShowPdfModal(false)}
-                  className="rounded-full p-2 transition hover:bg-amber-100"
-                >
-                  <X className="h-5 w-5 text-gray-600" />
-                </button>
+                <div className="flex items-center gap-3">
+                  {rawPdfUrl && (
+                    <a
+                      href={rawPdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-500/20 transition"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      নতুন ট্যাবে খুলুন
+                    </a>
+                  )}
+                  <button
+                    onClick={() => setShowPdfModal(false)}
+                    className="rounded-full p-2 transition hover:bg-amber-100"
+                  >
+                    <X className="h-5 w-5 text-gray-600" />
+                  </button>
+                </div>
               </div>
 
               {/* ─── PDF Viewer ────────────────────────────────── */}
               <div className="h-[70vh] w-full bg-gray-50 p-4">
-                {book.pdfUrl ? (
-                  <embed
-                    src={book.pdfUrl}
-                    type="application/pdf"
-                    className="h-full w-full rounded-lg shadow-inner"
+                {embeddablePdfUrl ? (
+                  <iframe
+                    src={embeddablePdfUrl}
+                    title={`${book.title} PDF Sample`}
+                    className="h-full w-full rounded-lg shadow-inner border-0"
+                    allow="autoplay"
                   />
                 ) : (
                   <div className="flex h-full flex-col items-center justify-center text-center">
@@ -680,4 +717,3 @@ const DetailRow = ({ icon, label, value, isLast = false }) => {
     </div>
   );
 };
-

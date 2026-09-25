@@ -31,7 +31,7 @@ const ProductForm = () => {
         sold: 0,
         language: 'বাংলা',
         pages: '',
-        publisher: 'Dhawa Publication',
+        publisher: 'Dawah Publication',
         isbn: '',
         edition: '',
         publishDate: '',
@@ -39,6 +39,7 @@ const ProductForm = () => {
         recent: false,
         bestSeller: false,
         status: 'published',
+        samplePdfUrl: '',
     });
 
     const [imageType, setImageType] = useState('upload');
@@ -354,7 +355,7 @@ const ProductForm = () => {
                                 name="publisher"
                                 value={formData.publisher}
                                 onChange={handleChange}
-                                placeholder="Dhawa Publication"
+                                placeholder="Dawah Publication"
                                 className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-gray-900 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
                             />
                         </div>
@@ -381,8 +382,8 @@ const ProductForm = () => {
                                         setImagePreview('');
                                     }}
                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition ${imageType === 'upload'
-                                            ? 'bg-emerald-700 text-white'
-                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                        ? 'bg-emerald-700 text-white'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                         }`}
                                 >
                                     Upload Image
@@ -395,8 +396,8 @@ const ProductForm = () => {
                                         setImagePreview('');
                                     }}
                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition ${imageType === 'url'
-                                            ? 'bg-emerald-700 text-white'
-                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                        ? 'bg-emerald-700 text-white'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                         }`}
                                 >
                                     Image URL
@@ -471,7 +472,21 @@ const ProductForm = () => {
                         </div>
                     </div>
                 </div>
+                <div>
 
+
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        PDF নমুনা লিঙ্ক (PDF Sample URL / Google Drive View Link)
+                    </label>
+                    <input
+                        type="url"
+                        name="samplePdfUrl"
+                        value={formData.samplePdfUrl}
+                        onChange={(e) => setFormData({ ...formData, samplePdfUrl: e.target.value })}
+                        placeholder="https://example.com/sample.pdf or Drive link"
+                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-emerald-500 outline-none"
+                    />
+                </div>
                 {/* DESCRIPTION */}
                 <div className="mb-8">
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
