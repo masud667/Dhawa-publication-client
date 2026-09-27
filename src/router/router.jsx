@@ -16,6 +16,7 @@ import PrivateRoute from "../Context/PrivateRoute";
 import AdminRoute from "./AdminRoute";
 import AboutUs from "../Pages/About/AboutUs";
 import OrderDashboard from "../Admin/Order/OrderDashboard";
+import AdminOrders from "../Admin/Order/AdminOrders";
 
 export const router = createBrowserRouter([
   {
@@ -67,7 +68,7 @@ export const router = createBrowserRouter([
           },
           {
             path: 'orders',
-            element: <OrderDashboard />,
+            element: <AdminOrders />,
           },
 
           {

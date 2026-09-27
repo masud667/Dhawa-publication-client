@@ -1,4 +1,3 @@
-// src/components/Layout/CompactNavbar.jsx
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router';
 import { FaSearch, FaShoppingBag } from 'react-icons/fa';
@@ -32,12 +31,12 @@ const CompactNavbar = () => {
 
   return (
     <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
-      {/* ─── Left: Compact Logo ─────────────────────────────────────── */}
-      <div className="flex-shrink-0">
+      {/* Left: Compact Logo */}
+      <div className="shrink-0 flex items-center h-full">
         <Logo />
       </div>
 
-      {/* ─── Center: Navigation Links ───────────────────────────────── */}
+      {/* Center: Navigation Links */}
       <nav className="hidden lg:flex items-center gap-6">
         {activeMenuItems.map((item) => (
           <NavLink
@@ -55,34 +54,16 @@ const CompactNavbar = () => {
         ))}
       </nav>
 
-      {/* ─── Right: Quick Search + Cart + Profile ────────────────────── */}
-      <div className="flex items-center gap-3">
-        {/* Compact Search Bar */}
-        <form onSubmit={handleSearchSubmit} className="hidden sm:flex items-center">
-          <div className="relative">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="খুঁজুন..."
-              className="input input-sm bg-emerald-800/60 text-white placeholder-emerald-200 border-emerald-600 focus:outline-none focus:border-amber-300 rounded-full pl-3 pr-8 w-36 sm:w-48 text-xs"
-            />
-            <button
-              type="submit"
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-emerald-200 hover:text-white"
-            >
-              <FaSearch size={12} />
-            </button>
-          </div>
-        </form>
+      {/* Right: Quick Search Input + Cart + Profile */}
+      <div className="flex items-center gap-3 shrink-0">
 
-        {/* Cart Icon (Hidden for Admins) */}
+
         {!isAdmin && (
           <div className="dropdown dropdown-end">
             <div tabIndex={0} role="button" className="btn btn-ghost btn-circle btn-sm relative">
               <FaShoppingBag size={16} className="text-white" />
               {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-600 text-[10px] font-bold text-white">
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-emerald-950">
                   {totalItems}
                 </span>
               )}
@@ -91,7 +72,6 @@ const CompactNavbar = () => {
           </div>
         )}
 
-        {/* User / Profile Menu */}
         <UserMenu />
       </div>
     </div>

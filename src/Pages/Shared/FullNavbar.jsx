@@ -1,4 +1,3 @@
-// src/components/Layout/FullNavbar.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router';
 import { FaSearch, FaShoppingBag } from 'react-icons/fa';
@@ -20,15 +19,12 @@ const FullNavbar = () => {
   const totalItems = useCartStore((state) => state.totalItems);
   const navigate = useNavigate();
 
-  // ─── Search States & Refs ──────────────────────────────────────────
   const [searchTerm, setSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-
   const containerRef = useRef(null);
 
-  // ─── Professional Relevance-Based Scoring Function ─────────────────
   const rankResultsByRelevance = (books, query) => {
     const q = query.toLowerCase().trim();
 
@@ -38,28 +34,20 @@ const FullNavbar = () => {
         const author = (book.author || '').toLowerCase();
 
         let score = 0;
-
-        // 1. Exact title match (Highest Priority)
         if (title === q) score += 100;
-        // 2. Title starts with query (First letter / prefix match)
         else if (title.startsWith(q)) score += 80;
-        // 3. Word inside title starts with query
         else if (title.split(' ').some((word) => word.startsWith(q))) score += 60;
-        // 4. Title contains query anywhere else
         else if (title.includes(q)) score += 40;
 
-        // 5. Author matches
         if (author.startsWith(q)) score += 30;
         else if (author.includes(q)) score += 10;
 
         return { book, score };
       })
-      // Sort in descending order: Highest relevance score first
       .sort((a, b) => b.score - a.score)
       .map((item) => item.book);
   };
 
-  // ─── Debounced Fetch Suggestions ──────────────────────────────────
   useEffect(() => {
     const query = searchTerm.trim();
 
@@ -72,18 +60,16 @@ const FullNavbar = () => {
     const timer = setTimeout(async () => {
       try {
         setIsLoading(true);
-        const { data } = await api.get(`/books?search=${encodeURIComponent(query)}`);
+        const response = await api.get(`/books?search=${encodeURIComponent(query)}`);
+        const rawBooks = Array.isArray(response.data)
+          ? response.data
+          : response.data?.books || response.data?.data || [];
 
-        // Normalizing API response payload
-        const rawBooks = Array.isArray(data) ? data : data.books || [];
-
-        // Apply relevance ranking (Prefix matches show first)
         const sortedBooks = rankResultsByRelevance(rawBooks, query);
-
-        setSuggestions(sortedBooks.slice(0, 6)); // Top 6 results
+        setSuggestions(sortedBooks.slice(0, 6));
         setIsOpen(true);
       } catch (error) {
-        console.error('Search suggestion fetch error:', error);
+        console.error('Search fetch error:', error);
         setSuggestions([]);
       } finally {
         setIsLoading(false);
@@ -93,7 +79,6 @@ const FullNavbar = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // ─── Close Suggestions on Outside Click ───────────────────────────
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (containerRef.current && !containerRef.current.contains(event.target)) {
@@ -105,14 +90,11 @@ const FullNavbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // ─── Form Submission Handler ──────────────────────────────────────
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!searchTerm.trim()) return;
 
     setIsOpen(false);
-
-    // Redirect admin search to admin page, user search to store page
     const targetPath = isAdmin
       ? `/admin/books?search=${encodeURIComponent(searchTerm.trim())}`
       : `/books?search=${encodeURIComponent(searchTerm.trim())}`;
@@ -122,40 +104,39 @@ const FullNavbar = () => {
 
   return (
     <>
-      {/* Layer 1: TopBar (hidden on mobile) */}
-      <div className="hidden sm:block">
+      {/* TopBar */}
+      <div className="hidden sm:block border-b border-emerald-600/30">
         <TopBar />
       </div>
 
-      {/* Layer 2: Logo + Search (desktop) + Cart/User */}
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-3">
-        {/* Logo */}
-        <div className="flex-shrink-0">
+      {/* Main Header Row */}
+      <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
+        <div className="shrink-0">
           <Logo />
         </div>
 
-        {/* Search – hidden on mobile, shown from md upwards */}
-        <div className="relative hidden md:flex flex-1 min-w-[180px] max-w-2xl" ref={containerRef}>
-          <form onSubmit={handleSubmit} className="flex w-full">
+        {/* Search Bar Container */}
+        <div className="relative hidden md:flex flex-1 min-w-[200px] max-w-2xl items-center h-10 shrink-0" ref={containerRef}>
+          <form onSubmit={handleSubmit} className="flex w-full items-center h-full">
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onFocus={() => searchTerm.trim() && setIsOpen(true)}
               placeholder={isAdmin ? "বই বা উপাদান খুঁজুন..." : "বই খুঁজুন..."}
-              className="input input-bordered w-full rounded-r-none border-gray-300 focus:border-emerald-500 focus:outline-none bg-white text-gray-900 h-9 sm:h-10 text-sm"
+              className="w-full h-full rounded-l-lg border-0 bg-white text-gray-900 px-3.5 text-sm focus:outline-none shadow-sm"
             />
             <button
               type="submit"
-              className="btn rounded-l-none bg-emerald-600 hover:bg-emerald-700 border-emerald-600 text-white px-3 sm:px-4 h-9 sm:h-10"
+              className="bg-emerald-800 hover:bg-emerald-900 text-white px-4 h-full rounded-r-lg flex items-center justify-center shrink-0 transition-colors"
             >
-              <FaSearch size={14} className="sm:size-4" />
+              <FaSearch size={14} />
             </button>
           </form>
 
-          {/* Search Suggestions Dropdown */}
+          {/* Search Dropdown */}
           {isOpen && (
-            <div className="absolute top-full left-0 right-0 mt-1 z-50 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
+            <div className="absolute top-full left-0 right-0 mt-1 z-50 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg text-gray-900">
               {isLoading ? (
                 <div className="p-3 text-center text-sm text-gray-500">
                   খোঁজা হচ্ছে...
@@ -211,15 +192,14 @@ const FullNavbar = () => {
           )}
         </div>
 
-        {/* Cart + User (always visible) */}
-        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-          {/* Hide Cart for Admins */}
+        {/* Cart + Profile */}
+        <div className="flex items-center gap-3 shrink-0">
           {!isAdmin && (
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn btn-ghost btn-circle relative">
-                <FaShoppingBag size={18} className="sm:size-5 text-white" />
+                <FaShoppingBag size={18} className="text-white" />
                 {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-emerald-600 text-[10px] sm:text-xs font-bold text-white">
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-emerald-950">
                     {totalItems}
                   </span>
                 )}
@@ -231,8 +211,8 @@ const FullNavbar = () => {
         </div>
       </div>
 
-      {/* Layer 3: Menu Bar (hidden on mobile) */}
-      <nav className="hidden lg:flex border-t border-emerald-600/30 py-2">
+      {/* Navigation Links Layer */}
+      <nav className="hidden lg:flex border-t border-emerald-600/30 py-2.5">
         <div className="container mx-auto px-4 flex items-center justify-center gap-8">
           {activeMenuItems.map((item) => (
             <NavLink
@@ -240,8 +220,8 @@ const FullNavbar = () => {
               to={item.path}
               className={({ isActive }) =>
                 `text-sm font-medium transition-colors duration-200 ${isActive
-                  ? 'text-amber-300 border-b-2 border-amber-300'
-                  : 'text-white hover:text-gray-200'
+                  ? 'text-amber-300 font-semibold border-b-2 border-amber-300 pb-0.5'
+                  : 'text-white hover:text-emerald-100'
                 }`
               }
             >

@@ -16,7 +16,7 @@ const Logo = () => {
       <img
         src="/logo.jpeg"
         alt="DawahPublication"
-        className="h-10 w-auto object-contain"
+        className="h-12 w-auto object-contain"
       />
     </Link>
   );
