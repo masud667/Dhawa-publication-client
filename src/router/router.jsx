@@ -17,6 +17,7 @@ import AdminRoute from "./AdminRoute";
 import AboutUs from "../Pages/About/AboutUs";
 import OrderDashboard from "../Admin/Order/OrderDashboard";
 import AdminOrders from "../Admin/Order/AdminOrders";
+import AdminReviews from "../Admin/Reviews/AdminReviews";
 
 export const router = createBrowserRouter([
   {
@@ -69,6 +70,10 @@ export const router = createBrowserRouter([
           {
             path: 'orders',
             element: <AdminOrders />,
+          },
+          {
+            path: 'reviews',
+            element: <AdminReviews />,
           },
 
           {

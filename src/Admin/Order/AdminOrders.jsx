@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import api from '../../api/axios';
 
+
 const AdminOrders = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -26,19 +27,27 @@ const AdminOrders = () => {
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // অর্ডার ফেচ করা (GET /orders)
+    // অর্ডার ফেচ করা (ফাইল থেকে পুরনো fetchOrders ফাংশনটি এটি দিয়ে replace করুন)
     const fetchOrders = async () => {
         try {
             setLoading(true);
             const { data } = await api.get('/orders');
-            setOrders(Array.isArray(data) ? data : data.orders || []);
+
+            // ব্যাকএন্ডের স্ট্রাকচার অনুযায়ী ডাটা সেট করা
+            if (Array.isArray(data)) {
+                setOrders(data);
+            } else if (data.orders && Array.isArray(data.orders)) {
+                setOrders(data.orders);
+            } else {
+                setOrders([]);
+            }
         } catch (error) {
             console.error('Error fetching orders:', error);
+            setOrders([]);
         } finally {
             setLoading(false);
         }
     };
-
     useEffect(() => {
         fetchOrders();
     }, []);
@@ -161,8 +170,8 @@ const AdminOrders = () => {
                                 key={status}
                                 onClick={() => setStatusFilter(status)}
                                 className={`rounded-lg px-3 py-1.5 text-xs font-semibold capitalize transition ${statusFilter === status
-                                        ? 'bg-emerald-700 text-white shadow-sm'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    ? 'bg-emerald-700 text-white shadow-sm'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                     }`}
                             >
                                 {status === 'all'
@@ -301,7 +310,7 @@ const AdminOrders = () => {
                                         <div className="rounded-xl border border-gray-200 p-4">
                                             <h4 className="font-bold text-gray-800 mb-2">শিপিং ঠিকানা</h4>
                                             <p className="text-gray-700 text-xs leading-relaxed">
-                                                {selectedOrder.shipping?.address}, {selectedOrder.shipping?.district} - {selectedOrder.shipping?.postCode}
+                                                {selectedOrder.shipping?.address}, থানা: {selectedOrder.shipping?.thana} ,{selectedOrder.shipping?.district}
                                             </p>
                                             <p className="text-xs font-semibold text-emerald-700 mt-2">
                                                 পেমেন্ট পদ্ধতি: {selectedOrder.paymentMethod === 'cod' ? 'ক্যাশ অন ডেলিভারি' : selectedOrder.paymentMethod}

@@ -54,33 +54,6 @@ const getEmbeddablePdfUrl = (url) => {
   return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
 };
 
-// ─── Sample Review Data (replace with API later) ──────────
-const sampleReviews = [
-  {
-    id: 1,
-    name: 'আব্দুল্লাহ আল-মামুন',
-    rating: 5,
-    comment: 'অসাধারণ একটি বই! ভাষা সহজ এবং বিষয়বস্তু অত্যন্ত সমৃদ্ধ। প্রতিটি অধ্যায় পড়ার পর নতুন কিছু শিখতে পারলাম।',
-    date: '১৫ আগস্ট, ২০২৬',
-    avatar: 'https://ui-avatars.com/api/?name=আব্দুল্লাহ&background=174D3B&color=fff&size=40',
-  },
-  {
-    id: 2,
-    name: 'নাদিয়া খাতুন',
-    rating: 4,
-    comment: 'বইটি ভালো লাগলো, তবে কিছু জায়গায় আরও বিস্তারিত আশা করেছিলাম। তবুও সামগ্রিকভাবে উপভোগ্য।',
-    date: '১০ আগস্ট, ২০২৬',
-    avatar: 'https://ui-avatars.com/api/?name=নাদিয়া&background=8B681D&color=fff&size=40',
-  },
-  {
-    id: 3,
-    name: 'মো. হাসান',
-    rating: 5,
-    comment: 'এটি আমার পড়া সেরা ইসলামিক বইগুলোর মধ্যে একটি। লেখকের চিন্তাধারা অসাধারণ এবং উপস্থাপনা দারুণ।',
-    date: '৫ আগস্ট, ২০২৬',
-    avatar: 'https://ui-avatars.com/api/?name=হাসান&background=2D6A55&color=fff&size=40',
-  },
-];
 
 export const BookDetails = () => {
   const { id } = useParams();
@@ -175,7 +148,8 @@ export const BookDetails = () => {
     setUserReview('');
     setShowReviewForm(false);
   };
-
+  const user = JSON.parse(localStorage.getItem("user")) || {};
+  const isAdmin = user.role === "admin";
   // ─── Loading State ──────────────────────────────────────────
   if (isLoading) {
     return (
@@ -461,7 +435,7 @@ export const BookDetails = () => {
         </div>
       </section>
 
-      {/* ─── Reviews Section ────────────────────────────────── */}
+      {/* ─── Reviews Section (with Admin Moderation) ────────────────── */}
       <section className="border-t border-amber-200/30 bg-white/80 py-16">
         <div className="container mx-auto max-w-[1200px] px-4">
           <div className="max-w-4xl mx-auto">
@@ -526,7 +500,7 @@ export const BookDetails = () => {
                       rows={4}
                       value={userReview}
                       onChange={(e) => setUserReview(e.target.value)}
-                      className="w-full rounded-lg border border-gray-300 p-3 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+                      className="w-full rounded-lg border border-gray-300 p-3 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none text-gray-700"
                       placeholder="বইটি সম্পর্কে আপনার অনুভূতি শেয়ার করুন..."
                     />
                   </div>
@@ -542,38 +516,76 @@ export const BookDetails = () => {
               </motion.div>
             )}
 
-            {/* ─── Reviews List ────────────────────────────── */}
+            {/* ─── Reviews List with Admin Controls ────────────── */}
             <div className="space-y-6">
               {reviews.length === 0 ? (
                 <p className="text-gray-500 text-center py-8">এখনো কোনো রিভিউ নেই। প্রথম রিভিউ দিন!</p>
               ) : (
                 reviews.map((review) => (
                   <motion.div
-                    key={review.id}
+                    key={review.id || review._id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="rounded-2xl border border-amber-200/30 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+                    className="rounded-2xl border border-amber-200/30 bg-white p-6 shadow-sm transition-shadow hover:shadow-md relative"
                   >
                     <div className="flex items-start gap-4">
                       <img
-                        src={review.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.name)}&background=174D3B&color=fff&size=40`}
-                        alt={review.name}
-                        className="h-12 w-12 rounded-full object-cover"
+                        src={review.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.name || review.userName || 'User')}&background=174D3B&color=fff&size=40`}
+                        alt={review.name || review.userName}
+                        className="h-12 w-12 rounded-full object-cover shrink-0"
                       />
                       <div className="flex-1">
                         <div className="flex flex-wrap items-center justify-between gap-2">
-                          <h4 className="font-semibold text-[#174D3B]">{review.name}</h4>
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-semibold text-[#174D3B]">{review.name || review.userName}</h4>
+                            {/* যদি অ্যাডমিন প্যানেল মোড হয়, তবে স্ট্যাটাস ব্যাজ দেখাবে */}
+                            {isAdmin && (
+                              <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${review.status === 'approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                                }`}>
+                                {review.status === 'approved' ? 'অনুমোদিত' : 'পেন্ডিং'}
+                              </span>
+                            )}
+                          </div>
                           <div className="flex items-center gap-2 text-sm text-gray-400">
                             <Clock className="h-3.5 w-3.5" />
-                            {review.date}
+                            {review.date || new Date(review.createdAt).toLocaleDateString('bn-BD')}
                           </div>
                         </div>
+
                         <div className="mt-1 flex text-amber-400">
                           {[...Array(5)].map((_, i) => (
                             <Star key={i} className={`h-4 w-4 ${i < review.rating ? 'fill-current' : 'fill-none text-gray-300'}`} />
                           ))}
                         </div>
+
                         <p className="mt-2 text-gray-700 leading-relaxed">{review.comment}</p>
+
+                        {/* ─── Admin Action Buttons (Show only if isAdmin is true) ─── */}
+                        {isAdmin && (
+                          <div className="mt-4 flex items-center gap-3 border-t border-gray-100 pt-3">
+                            {review.status === 'pending' ? (
+                              <button
+                                onClick={() => handleApproveReview(review._id || review.id)}
+                                className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100"
+                              >
+                                অনুমোদন করুন
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handlePendingReview(review._id || review.id)}
+                                className="inline-flex items-center gap-1 rounded-lg bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 transition hover:bg-amber-100"
+                              >
+                                পেন্ডিং করুন
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleDeleteReview(review._id || review.id)}
+                              className="inline-flex items-center gap-1 rounded-lg bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 transition hover:bg-red-100"
+                            >
+                              ডিলিট
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </motion.div>

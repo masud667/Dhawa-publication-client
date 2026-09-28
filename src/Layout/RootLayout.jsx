@@ -5,11 +5,11 @@ import Footer from '../Pages/Shared/Footer'
 
 function RootLayout() {
   return (
-    
+
     <div>
-        <Navber></Navber>
-        <Outlet></Outlet>
-        <Footer></Footer>
+      <Navber></Navber>
+      <Outlet></Outlet>
+      <Footer></Footer>
     </div>
   )
 }

@@ -40,27 +40,6 @@ const AdminHeader = ({ onMenuClick }) => {
                     </h1>
                 </div>
 
-                {/* =========================================
-            RIGHT SIDE
-        ========================================= */}
-                <button
-                    type="button"
-                    onClick={logout}
-                    className="
-            flex
-            items-center
-            gap-2
-            text-red-600
-            hover:text-red-700
-            transition
-          "
-                >
-                    <LogOut className="h-4 w-4" />
-
-                    <span className="hidden sm:inline">
-                        Logout
-                    </span>
-                </button>
 
             </div>
         </header>

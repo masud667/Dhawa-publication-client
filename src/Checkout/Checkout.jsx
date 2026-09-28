@@ -71,7 +71,7 @@ const Checkout = () => {
       phone: '',
       address: '',
       district: '',
-      postCode: '',
+      thana: '',
     },
     shipping: {
       fullName: '',
@@ -79,7 +79,7 @@ const Checkout = () => {
       phone: '',
       address: '',
       district: '',
-      postCode: '',
+      thana: '',
     },
     orderNotes: '',
     paymentMethod: 'cod',
@@ -141,7 +141,7 @@ const Checkout = () => {
     if (!data.phone?.trim()) err.phone = 'ফোন নম্বর প্রয়োজন';
     if (!data.address?.trim()) err.address = 'ঠিকানা প্রয়োজন';
     if (!data.district?.trim()) err.district = 'জেলা নির্বাচন করুন';
-    if (!data.postCode?.trim()) err.postCode = 'পোস্ট কোড প্রয়োজন';
+    if (!data.thana?.trim()) err.thana = 'থানার নাম প্রয়োজন';
     if (!data.email?.trim()) err.email = 'ইমেইল প্রয়োজন';
     else if (!/\S+@\S+\.\S+/.test(data.email)) err.email = 'সঠিক ইমেইল দিন';
     return err;
@@ -294,10 +294,10 @@ const Checkout = () => {
             <div key={step.id} className="flex flex-1 items-center gap-2">
               <div
                 className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold transition-all duration-300 ${index < currentStep
-                    ? 'bg-emerald-600 text-white'
-                    : index === currentStep
-                      ? 'bg-emerald-600 text-white ring-4 ring-emerald-200'
-                      : 'bg-gray-200 text-gray-600'
+                  ? 'bg-emerald-600 text-white'
+                  : index === currentStep
+                    ? 'bg-emerald-600 text-white ring-4 ring-emerald-200'
+                    : 'bg-gray-200 text-gray-600'
                   }`}
               >
                 {index < currentStep ? <Check className="h-5 w-5" /> : index + 1}
@@ -308,10 +308,10 @@ const Checkout = () => {
                 </p>
                 <div
                   className={`mt-1 h-1 rounded-full transition-all duration-500 ${index < currentStep
-                      ? 'bg-emerald-600'
-                      : index === currentStep
-                        ? 'bg-emerald-200'
-                        : 'bg-gray-200'
+                    ? 'bg-emerald-600'
+                    : index === currentStep
+                      ? 'bg-emerald-200'
+                      : 'bg-gray-200'
                     }`}
                 />
               </div>
@@ -491,16 +491,16 @@ const AddressStep = ({ formData, errors, onChange, sameAsBilling, onToggle, dist
             {err.district && <p className="mt-1 text-xs text-red-500">{err.district}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-800">পোস্ট কোড <span className="text-red-500">*</span></label>
+            <label className="block text-sm font-medium text-gray-800">থানা <span className="text-red-500">*</span></label>
             <input
               type="text"
-              name={`${prefix}.postCode`}
-              value={data.postCode || ''}
+              name={`${prefix}.thana`}
+              value={data.thana || ''}
               onChange={onChange}
-              className={`w-full rounded-lg border ${err.postCode ? 'border-red-500' : 'border-gray-300'} bg-white text-gray-900 p-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500`}
-              placeholder="1200"
+              className={`w-full rounded-lg border ${err.thana ? 'border-red-500' : 'border-gray-300'} bg-white text-gray-900 p-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500`}
+              placeholder="থানার নাম লিখুন"
             />
-            {err.postCode && <p className="mt-1 text-xs text-red-500">{err.postCode}</p>}
+            {err.thana && <p className="mt-1 text-xs text-red-500">{err.thana}</p>}
           </div>
         </div>
       </div>

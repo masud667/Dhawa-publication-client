@@ -26,7 +26,7 @@ const banners = [
     title: "আত তাবসিরাহ",
     author: "ইমাম ইবনুল জাওযী রহ.",
     description: "আত্মশুদ্ধি ও হৃদয়ের অনুভূতি জাগিয়ে তোলার এক অনন্য সৃষ্টি। সীমিত সময়ের জন্য বিশেষ অফারে সংগ্রাহকদের জন্য উন্মুক্ত!",
-    bookCover: "/attabsirah.png",
+    bookCover: "/at-tabsirah.jpeg",
     ctaText: "এখনই প্রি-অর্ডার করুন",
     ctaLink: "/books/6ab7424f5a88664d7bc823eb",
   },
@@ -67,7 +67,7 @@ function Banner() {
           {banners.map((banner) => (
             <div
               key={banner.id}
-              className="relative min-w-full min-h-[400px] md:min-h-[480px] flex items-center overflow-hidden"
+              className="relative min-w-full min-h-[400px] md:min-h-[450px] flex items-center overflow-hidden"
             >
               {/* ─────────────────────────────────────────────────────────────
                   SLIDE 1: Full Background Image

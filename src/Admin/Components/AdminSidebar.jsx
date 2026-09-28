@@ -24,21 +24,21 @@ const AdminSidebar = ({ isOpen, onClose }) => {
             icon: BookOpen,
             label: 'Books',
         },
-        {
-            path: '/admin/categories',
-            icon: Tag,
-            label: 'Categories',
-        },
+        // {
+        //     path: '/admin/categories',
+        //     icon: Tag,
+        //     label: 'Categories',
+        // },
         {
             path: '/admin/orders',
             icon: ShoppingBag,
             label: 'Orders',
         },
-        {
-            path: '/admin/reviews',
-            icon: MessageSquare,
-            label: 'Reviews',
-        },
+        // {
+        //     path: '/admin/reviews',
+        //     icon: MessageSquare,
+        //     label: 'Reviews',
+        // },
     ];
 
     return (
