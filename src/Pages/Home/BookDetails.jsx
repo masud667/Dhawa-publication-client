@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { Link, useParams } from 'react-router';
 import {
   ChevronRight,
@@ -21,13 +21,15 @@ import {
   Check,
   X,
   ExternalLink,
+  MessageCircle,
+  ArrowDown,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 import { useCartStore } from '../../store/cartStore';
 
-import { BookCard } from './RecentBooks/BookCard'; // adjust path
+import { BookCard } from './RecentBooks/BookCard';
 import { AddToCartButton } from '../Shared';
 import axios from 'axios';
 import api from '../../api/axios';
@@ -38,25 +40,70 @@ const FALLBACK_IMAGE =
 const getEmbeddablePdfUrl = (url) => {
   if (!url) return null;
 
-  // Handle Google Drive links
   if (url.includes('drive.google.com')) {
-    // Extract file ID from various Google Drive URL formats
     const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
-
     if (match && match[1]) {
       const fileId = match[1];
-      // Force Google Drive's explicit preview embed URL
       return `https://drive.google.com/file/d/${fileId}/preview`;
     }
   }
 
-  // Fallback for direct PDF links (Firebase, Cloudinary, standard server hosting)
   return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
 };
 
+// ─── WhatsApp Button Component ─────────────────────────────
+const WhatsAppContactButton = ({ book }) => {
+  const whatsappNumber = "8801710728222";
+  const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const bookTitle = book?.title || "বইটি";
+  const bookPrice = book?.price || "মূল্য জানতে চাই";
 
+  const message = `আসসালামু আলাইকুম! আমি "${bookTitle}" (মূল্য: ৳${bookPrice}) বইটি সম্পর্কে জানতে চাই/অর্ডার করতে চাই।\nলিংক: ${currentUrl}`;
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+  // ─── Share Handler Function ─────────────────────────────────
+  const [copied, setCopied] = useState(false);
+
+  const handleShareBook = async () => {
+    const shareTitle = book?.title || 'দাওয়াহ পাবলিকেশন';
+    const shareText = `দাওয়াহ পাবলিকেশন থেকে "${shareTitle}" বইটি দেখে নিন!`;
+    const shareUrl = window.location.href;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: shareTitle,
+          text: shareText,
+          url: shareUrl,
+        });
+      } catch (err) {
+        console.log('Share canceled or failed:', err);
+      }
+    } else {
+      // Web Share API সাপোর্টেড না হলে লিংক কপি হবে
+      handleCopyLink();
+    }
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <a
+      href={whatsappUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex h-12 w-full xl:w-auto flex-1 items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 text-sm py-2 font-bold text-white shadow-sm transition-all duration-200 hover:bg-[#20bd5a] hover:shadow-md active:scale-95 border border-[#20bd5a]"
+    >
+      <MessageCircle className="h-4 w-4 fill-current shrink-0" />
+      <span className="whitespace-nowrap">হোয়াটসঅ্যাপে অর্ডার</span>
+    </a>
+  );
+};
 export const BookDetails = () => {
   const { id } = useParams();
+  const descriptionRef = useRef(null);
 
   // ─── State ──────────────────────────────────────────────────
   const [book, setBook] = useState(null);
@@ -85,14 +132,12 @@ export const BookDetails = () => {
         setError('');
 
         const { data } = await api.get(`/books/${id}`);
-
         setBook(data);
       } catch (error) {
         console.error(
           'Book details error:',
           error.response?.data || error.message
         );
-
         setBook(null);
         setError('বইটির তথ্য পাওয়া যায়নি।');
       } finally {
@@ -112,6 +157,39 @@ export const BookDetails = () => {
   // ─── Buy Now (open PDF modal) ──────────────────────────────
   const handleBuyNow = () => {
     setShowPdfModal(true);
+  };
+  // ─── Share Handler Function ─────────────────────────────────
+  const [copied, setCopied] = useState(false);
+
+  const handleShareBook = async () => {
+    const shareTitle = book?.title || 'দাওয়াহ পাবলিকেশন';
+    const shareText = `দাওয়াহ পাবলিকেশন থেকে "${shareTitle}" বইটি দেখে নিন!`;
+    const shareUrl = window.location.href;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: shareTitle,
+          text: shareText,
+          url: shareUrl,
+        });
+      } catch (err) {
+        console.log('Share canceled or failed:', err);
+      }
+    } else {
+      // Web Share API সাপোর্টেড না হলে লিংক কপি হবে
+      handleCopyLink();
+    }
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  // ─── Scroll to Full Description ───────────────────────────
+  const scrollToDescription = () => {
+    descriptionRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   // ─── Handlers ──────────────────────────────────────────────
@@ -137,7 +215,7 @@ export const BookDetails = () => {
     if (userRating === 0 || userReview.trim() === '') return;
     const newReview = {
       id: Date.now(),
-      name: 'আপনি', // would come from auth
+      name: 'আপনি',
       rating: userRating,
       comment: userReview,
       date: new Date().toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' }),
@@ -148,8 +226,10 @@ export const BookDetails = () => {
     setUserReview('');
     setShowReviewForm(false);
   };
+
   const user = JSON.parse(localStorage.getItem("user")) || {};
   const isAdmin = user.role === "admin";
+
   // ─── Loading State ──────────────────────────────────────────
   if (isLoading) {
     return (
@@ -195,7 +275,6 @@ export const BookDetails = () => {
     );
   }
 
-  // ─── Main Render ────────────────────────────────────────────
   return (
     <main className="min-h-screen bg-[#FAF9F5]">
       {/* ─── Geometric Pattern Background ────────────────── */}
@@ -243,17 +322,12 @@ export const BookDetails = () => {
               className="mx-auto w-full max-w-[340px]"
             >
               <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-white to-amber-50/30 p-4 shadow-[0_20px_60px_rgba(42,50,45,0.12)] transition-shadow duration-300 hover:shadow-[0_30px_80px_rgba(42,50,45,0.18)]">
-                {/* ─── Decorative Border Glow ────────────── */}
-                <div className="absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-amber-400/20 via-emerald-500/20 to-amber-400/20 opacity-50 blur-xl transition-opacity duration-500 group-hover:opacity-100" />
-
-                {/* ─── Discount Badge ────────────────────── */}
                 {discountPercent > 0 && (
                   <div className="absolute left-5 top-5 z-10 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-600 text-sm font-bold text-white shadow-lg shadow-amber-500/30">
                     -{discountPercent}%
                   </div>
                 )}
 
-                {/* ─── Image Container ────────────────────── */}
                 <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-[#EEE9DF]">
                   <img
                     src={book.image || FALLBACK_IMAGE}
@@ -263,20 +337,19 @@ export const BookDetails = () => {
                     }}
                     className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                  {/* ─── Hover Overlay ────────────────────── */}
+                  {/* ─── Image Hover Overlay Share Icon ────────────────────── */}
                   <div className="absolute inset-0 flex items-center justify-center gap-4 bg-black/0 opacity-0 transition-all duration-400 group-hover:bg-black/20 group-hover:opacity-100">
-                    <button className="rounded-full bg-white/90 p-3 shadow-lg transition hover:scale-110">
-                      <Heart className="h-5 w-5 text-rose-500" />
-                    </button>
-                    <button className="rounded-full bg-white/90 p-3 shadow-lg transition hover:scale-110">
+
+                    <button
+                      type="button"
+                      onClick={handleShareBook}
+                      title="বইটি শেয়ার করুন"
+                      className="rounded-full bg-white/90 p-3 shadow-lg transition hover:scale-110"
+                    >
                       <Share2 className="h-5 w-5 text-emerald-600" />
                     </button>
                   </div>
                 </div>
-
-                {/* ─── Corner Decorations ────────────────── */}
-                <div className="absolute bottom-3 right-3 text-amber-300/30 text-sm">✦</div>
-                <div className="absolute top-3 left-3 text-amber-300/30 text-sm">✦</div>
               </div>
             </motion.div>
 
@@ -286,34 +359,64 @@ export const BookDetails = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              {/* ─── Category ────────────────────────────── */}
               {book.section && (
                 <p className="mb-2 text-xs font-bold tracking-[0.15em] text-amber-600 uppercase">
                   {book.section}
                 </p>
               )}
 
-              {/* ─── Title ────────────────────────────────── */}
               <h1 className="border-b border-amber-200/40 pb-5 font-serif text-3xl font-bold leading-tight text-[#263D35] md:text-4xl lg:text-5xl">
                 {book.title}
                 <span className="mt-2 block h-0.5 w-16 rounded-full bg-gradient-to-r from-amber-400 to-emerald-500" />
               </h1>
+              {/* ─── Title & Share Bar ────────────────────────────────── */}
+              <div className="flex items-start justify-between gap-4 border-b border-amber-200/40 pb-5">
 
-              {/* ─── Author ───────────────────────────────── */}
+
+                {/* Quick Share Buttons */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleShareBook}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-amber-200/60 bg-white px-3 py-1.5 text-xs font-semibold text-emerald-800 shadow-sm transition hover:bg-emerald-50 hover:border-emerald-300"
+                    title="শেয়ার করুন"
+                  >
+                    <Share2 className="h-3.5 w-3.5 text-emerald-600" />
+                    <span className="hidden sm:inline">শেয়ার</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleCopyLink}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-amber-200/60 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-amber-50"
+                    title="লিংক কপি করুন"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="h-3.5 w-3.5 text-emerald-600" />
+                        <span className="text-emerald-600">কপি হয়েছে!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Share2 className="h-3.5 w-3.5 text-amber-600" />
+                        <span className="hidden sm:inline">লিংক কপি</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
               {book.author && (
                 <p className="mt-3 text-sm font-medium text-[#5D655F]">
                   <span className="text-amber-600">লেখক:</span> {book.author}
                 </p>
               )}
 
-              {/* ─── Converter/Translator ─────────────────── */}
               {book.converter && (
                 <p className="mt-3 text-sm font-medium text-[#5D655F]">
                   <span className="text-amber-600">অনুবাদক:</span> {book.converter}
                 </p>
               )}
 
-              {/* ─── Price ────────────────────────────────── */}
               <div className="mt-5 flex flex-wrap items-center gap-4">
                 {price > discountPrice && (
                   <span className="text-lg text-gray-400 line-through">{formatPrice(price)}</span>
@@ -326,12 +429,19 @@ export const BookDetails = () => {
                 )}
               </div>
 
-              {/* ─── Short Description ────────────────────── */}
+              {/* ─── Short Description + Scroll Button ──────── */}
               {book.description && (
                 <div className="mt-5 border-b border-amber-200/30 pb-5">
                   <p className="text-[15px] leading-8 text-[#5D655F] line-clamp-3">
                     {book.description}
                   </p>
+                  <button
+                    onClick={scrollToDescription}
+                    className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-800 transition underline underline-offset-4"
+                  >
+                    <span>বিস্তারিত বিবরণ দেখুন</span>
+                    <ArrowDown className="h-3.5 w-3.5 animate-bounce text-emerald-600" />
+                  </button>
                 </div>
               )}
 
@@ -372,32 +482,33 @@ export const BookDetails = () => {
                 )}
               </div>
 
-              {/* ─── Quantity + Cart ──────────────────────── */}
-              <div className="mt-7 flex flex-wrap items-center gap-3">
-                {/* ─── Quantity Selector ────────────────── */}
-                <div className="flex h-12 items-center rounded-full border border-amber-200/50 bg-white shadow-sm">
+              {/* ─── Responsive Buttons: PC (1 Row) & Mobile (3 Rows) ──────────────────────── */}
+              <div className="mt-7 flex flex-col xl:flex-row items-stretch xl:items-center gap-3">
+
+                {/* Row 1 (Mobile) / Element 1 (PC): Quantity Selector */}
+                <div className="flex h-12 items-center justify-between rounded-full border border-amber-200/60 bg-white shadow-sm shrink-0 px-2 w-full xl:w-auto">
                   <button
                     type="button"
                     onClick={decreaseQuantity}
-                    className="flex h-full w-11 items-center justify-center rounded-l-full text-gray-500 transition hover:bg-amber-50 hover:text-[#174D3B]"
+                    className="flex h-9 w-9 items-center justify-center rounded-full text-gray-500 transition hover:bg-amber-50 hover:text-[#174D3B]"
                     aria-label="Decrease quantity"
                   >
                     <Minus className="h-4 w-4" />
                   </button>
-                  <span className="flex h-full min-w-12 items-center justify-center px-3 font-semibold text-[#263D35]">
+                  <span className="flex h-full min-w-[36px] items-center justify-center px-2 font-bold text-[#263D35] text-sm">
                     {quantity}
                   </span>
                   <button
                     type="button"
                     onClick={increaseQuantity}
-                    className="flex h-full w-11 items-center justify-center rounded-r-full text-gray-500 transition hover:bg-amber-50 hover:text-[#174D3B]"
+                    className="flex h-9 w-9 items-center justify-center rounded-full text-gray-500 transition hover:bg-amber-50 hover:text-[#174D3B]"
                     aria-label="Increase quantity"
                   >
                     <Plus className="h-4 w-4" />
                   </button>
                 </div>
 
-                {/* ─── Reusable Add to Cart Button ────────────────── */}
+                {/* Row 2 (Mobile) / Element 2 (PC): Add to Cart */}
                 <AddToCartButton
                   product={{
                     id: book._id,
@@ -410,20 +521,24 @@ export const BookDetails = () => {
                   size="lg"
                   variant="primary"
                   label="কার্টে যোগ করুন"
-                  className="px-8"
+                  className="h-12 w-full xl:flex-1 rounded-full text-sm font-bold shadow-sm hover:shadow-md transition-all duration-200"
                 />
 
+                {/* Row 3 (Mobile) / Element 3 (PC): Read Sample */}
                 <button
                   type="button"
                   disabled={Number(book.stock) <= 0}
                   onClick={handleBuyNow}
-                  className="inline-flex h-12 items-center justify-center rounded-full border-2 border-amber-600 bg-transparent px-8 text-sm font-bold text-amber-600 transition hover:bg-amber-600 hover:text-white disabled:cursor-not-allowed disabled:border-gray-300 disabled:text-gray-300"
+                  className="inline-flex h-12 w-full xl:w-auto flex-1 items-center justify-center gap-2 rounded-full border-2 border-amber-600/80 bg-amber-50/40 px-5 py-2 text-sm font-bold text-amber-700 transition-all duration-200 hover:bg-amber-600 hover:text-white hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-100 disabled:text-gray-400"
                 >
-                  এখনই নমুনা পড়ুন
+                  <BookOpen className="h-4 w-4 shrink-0" />
+                  <span className="whitespace-nowrap">নমুনা পড়ুন</span>
                 </button>
-              </div>
 
-              {/* ─── Stock Note ───────────────────────────── */}
+                {/* Element 4 (PC) / Element in Row 3 area (Mobile): WhatsApp */}
+                <WhatsAppContactButton book={book} />
+
+              </div>
               {Number(book.stock) > 0 && (
                 <p className="mt-4 flex items-center gap-2 text-sm text-emerald-600">
                   <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
@@ -435,11 +550,10 @@ export const BookDetails = () => {
         </div>
       </section>
 
-      {/* ─── Reviews Section (with Admin Moderation) ────────────────── */}
+      {/* ─── Reviews Section ────────────────── */}
       <section className="border-t border-amber-200/30 bg-white/80 py-16">
         <div className="container mx-auto max-w-[1200px] px-4">
           <div className="max-w-4xl mx-auto">
-            {/* ─── Section Header ────────────────────────── */}
             <div className="mb-8 flex items-center gap-4">
               <h2 className="whitespace-nowrap font-serif text-3xl font-bold text-[#174D3B]">
                 গ্রাহক রিভিউ
@@ -448,7 +562,6 @@ export const BookDetails = () => {
               <span className="text-amber-300/40 text-xl">◈</span>
             </div>
 
-            {/* ─── Average Rating Summary ────────────────── */}
             <div className="mb-8 flex flex-wrap items-center gap-6 rounded-2xl bg-gradient-to-br from-amber-50/50 to-emerald-50/50 p-6 border border-amber-200/30">
               <div className="flex items-center gap-4">
                 <div className="text-4xl font-bold text-[#174D3B]">
@@ -457,7 +570,7 @@ export const BookDetails = () => {
                 <div>
                   <div className="flex text-amber-400">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className={`h-5 w-5 ${i < Math.round(reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length) ? 'fill-current' : 'fill-none text-gray-300'}`} />
+                      <Star key={i} className={`h-5 w-5 ${i < Math.round(reviews.reduce((acc, r) => acc + r.rating, 0) / (reviews.length || 1)) ? 'fill-current' : 'fill-none text-gray-300'}`} />
                     ))}
                   </div>
                   <span className="text-sm text-gray-500">{reviews.length}টি রিভিউ</span>
@@ -471,7 +584,6 @@ export const BookDetails = () => {
               </button>
             </div>
 
-            {/* ─── Review Form ────────────────────────────── */}
             {showReviewForm && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -516,7 +628,6 @@ export const BookDetails = () => {
               </motion.div>
             )}
 
-            {/* ─── Reviews List with Admin Controls ────────────── */}
             <div className="space-y-6">
               {reviews.length === 0 ? (
                 <p className="text-gray-500 text-center py-8">এখনো কোনো রিভিউ নেই। প্রথম রিভিউ দিন!</p>
@@ -538,7 +649,6 @@ export const BookDetails = () => {
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <div className="flex items-center gap-2">
                             <h4 className="font-semibold text-[#174D3B]">{review.name || review.userName}</h4>
-                            {/* যদি অ্যাডমিন প্যানেল মোড হয়, তবে স্ট্যাটাস ব্যাজ দেখাবে */}
                             {isAdmin && (
                               <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${review.status === 'approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
                                 }`}>
@@ -559,33 +669,6 @@ export const BookDetails = () => {
                         </div>
 
                         <p className="mt-2 text-gray-700 leading-relaxed">{review.comment}</p>
-
-                        {/* ─── Admin Action Buttons (Show only if isAdmin is true) ─── */}
-                        {isAdmin && (
-                          <div className="mt-4 flex items-center gap-3 border-t border-gray-100 pt-3">
-                            {review.status === 'pending' ? (
-                              <button
-                                onClick={() => handleApproveReview(review._id || review.id)}
-                                className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100"
-                              >
-                                অনুমোদন করুন
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => handlePendingReview(review._id || review.id)}
-                                className="inline-flex items-center gap-1 rounded-lg bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 transition hover:bg-amber-100"
-                              >
-                                পেন্ডিং করুন
-                              </button>
-                            )}
-                            <button
-                              onClick={() => handleDeleteReview(review._id || review.id)}
-                              className="inline-flex items-center gap-1 rounded-lg bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 transition hover:bg-red-100"
-                            >
-                              ডিলিট
-                            </button>
-                          </div>
-                        )}
                       </div>
                     </div>
                   </motion.div>
@@ -597,22 +680,9 @@ export const BookDetails = () => {
       </section>
 
       {/* ─── Description Section ────────────────────────────── */}
-      <section className="relative border-t border-amber-200/30 bg-gradient-to-b from-[#F1EDE5] to-[#FAF9F5] py-16">
-        {/* ─── Decorative Pattern ────────────────────────── */}
-        <div className="pointer-events-none absolute inset-0 opacity-[0.02]">
-          <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="descPattern" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M20 0 L40 20 L20 40 L0 20 Z" stroke="#B8860B" strokeWidth="0.5" fill="none" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#descPattern)" />
-          </svg>
-        </div>
-
+      <section ref={descriptionRef} className="relative border-t border-amber-200/30 bg-gradient-to-b from-[#F1EDE5] to-[#FAF9F5] py-16">
         <div className="container relative z-10 mx-auto max-w-[1200px] px-4">
           <div className="max-w-4xl">
-            {/* ─── Section Header ────────────────────────── */}
             <div className="mb-8 flex items-center gap-4">
               <h2 className="whitespace-nowrap font-serif text-3xl font-bold text-[#174D3B]">
                 বই সম্পর্কে
@@ -621,11 +691,7 @@ export const BookDetails = () => {
               <span className="text-amber-300/40 text-xl">◈</span>
             </div>
 
-            {/* ─── Description Content ────────────────────── */}
             <div className="relative overflow-hidden rounded-2xl border-l-4 border-amber-500 bg-white p-8 shadow-lg md:p-10">
-              <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-amber-50/50 blur-2xl" />
-              <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-emerald-50/50 blur-2xl" />
-
               <div className="relative z-10">
                 <p className="whitespace-pre-line text-[15px] leading-9 text-[#59615B]">
                   {book.description || 'এই বইটির বিস্তারিত বিবরণ এখনো যোগ করা হয়নি।'}
@@ -653,7 +719,6 @@ export const BookDetails = () => {
               className="relative w-full max-w-4xl rounded-2xl bg-white shadow-2xl overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* ─── Modal Header ────────────────────────────── */}
               <div className="flex items-center justify-between border-b border-amber-200/30 bg-[#FAF9F5] px-6 py-4">
                 <h3 className="font-serif text-xl font-bold text-[#174D3B]">
                   {book.title} – নমুনা পড়ুন
@@ -679,7 +744,6 @@ export const BookDetails = () => {
                 </div>
               </div>
 
-              {/* ─── PDF Viewer ────────────────────────────────── */}
               <div className="h-[70vh] w-full bg-gray-50 p-4">
                 {embeddablePdfUrl ? (
                   <iframe
@@ -690,15 +754,8 @@ export const BookDetails = () => {
                   />
                 ) : (
                   <div className="flex h-full flex-col items-center justify-center text-center">
-                    <div className="text-6xl mb-4">📄</div>
-                    <h4 className="text-lg font-semibold text-gray-700">নমুনা PDF উপলব্ধ নয়</h4>
-                    <p className="mt-2 text-sm text-gray-500">এই বইয়ের জন্য PDF নমুনা এখনো যোগ করা হয়নি।</p>
-                    <button
-                      onClick={() => setShowPdfModal(false)}
-                      className="mt-6 rounded-full bg-emerald-700 px-6 py-2 text-sm font-medium text-white transition hover:bg-emerald-800"
-                    >
-                      বন্ধ করুন
-                    </button>
+                    <BookOpen className="h-12 w-12 text-gray-300 mb-2" />
+                    <p className="text-gray-500 font-medium">নমুনা ফাইল পাওয়া যায়নি</p>
                   </div>
                 )}
               </div>
@@ -710,22 +767,19 @@ export const BookDetails = () => {
   );
 };
 
-// ─── Detail Row Component ────────────────────────────────────
+// Helper Row Component
 const DetailRow = ({ icon, label, value, isLast = false }) => {
   if (!value) return null;
-
   return (
     <div
-      className={`grid grid-cols-[120px_minmax(0,1fr)] sm:grid-cols-[160px_minmax(0,1fr)] ${!isLast ? 'border-b border-amber-200/30' : ''
-        }`}
+      className={`flex items-center justify-between px-5 py-3 text-sm ${!isLast ? 'border-b border-amber-200/20' : ''
+        } bg-white/70 hover:bg-amber-50/30 transition`}
     >
-      <div className="flex items-center gap-2 bg-[#F1EDE5] px-5 py-3.5 text-sm font-semibold text-[#34453D]">
+      <div className="flex items-center gap-2.5 text-[#5D655F]">
         <span className="text-amber-600">{icon}</span>
-        {label}
+        <span className="font-medium">{label}</span>
       </div>
-      <div className="flex items-center bg-white px-5 py-3.5 text-sm text-[#426151]">
-        {value}
-      </div>
+      <span className="font-semibold text-[#174D3B]">{value}</span>
     </div>
   );
 };

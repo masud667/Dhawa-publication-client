@@ -71,7 +71,7 @@ const Footer = () => {
             </h3>
 
             <div className="font-bold text-white text-sm">
-              আস সুফফা প্রকাশন
+              দাওয়া পাবলিকেশন
             </div>
 
             <div className="flex items-start gap-2 text-emerald-200/90">
