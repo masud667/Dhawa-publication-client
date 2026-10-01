@@ -33,6 +33,8 @@ import { BookCard } from './RecentBooks/BookCard';
 import { AddToCartButton } from '../Shared';
 import axios from 'axios';
 import api from '../../api/axios';
+import { trackAddToCart, trackViewItem } from '../../utils/gtm';
+import WhatsAppContactButton from '../Shared/WhatsAppButton';
 
 const FALLBACK_IMAGE =
   'https://placehold.co/600x850/F4F0E8/174D3B?text=Dawah+Publication';
@@ -51,56 +53,7 @@ const getEmbeddablePdfUrl = (url) => {
   return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
 };
 
-// ─── WhatsApp Button Component ─────────────────────────────
-const WhatsAppContactButton = ({ book }) => {
-  const whatsappNumber = "8801810728222";
-  const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
-  const bookTitle = book?.title || "বইটি";
-  const bookPrice = book?.price || "মূল্য জানতে চাই";
 
-  const message = `আসসালামু আলাইকুম! আমি "${bookTitle}" (মূল্য: ৳${bookPrice}) বইটি সম্পর্কে জানতে চাই/অর্ডার করতে চাই।\nলিংক: ${currentUrl}`;
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-  // ─── Share Handler Function ─────────────────────────────────
-  const [copied, setCopied] = useState(false);
-
-  const handleShareBook = async () => {
-    const shareTitle = book?.title || 'দাওয়াহ পাবলিকেশন';
-    const shareText = `দাওয়াহ পাবলিকেশন থেকে "${shareTitle}" বইটি দেখে নিন!`;
-    const shareUrl = window.location.href;
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: shareTitle,
-          text: shareText,
-          url: shareUrl,
-        });
-      } catch (err) {
-        console.log('Share canceled or failed:', err);
-      }
-    } else {
-      // Web Share API সাপোর্টেড না হলে লিংক কপি হবে
-      handleCopyLink();
-    }
-  };
-
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-  return (
-    <a
-      href={whatsappUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex h-12 w-full xl:w-auto flex-1 items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 text-sm py-2 font-bold text-white shadow-sm transition-all duration-200 hover:bg-[#20bd5a] hover:shadow-md active:scale-95 border border-[#20bd5a]"
-    >
-      <MessageCircle className="h-4 w-4 fill-current shrink-0" />
-      <span className="whitespace-nowrap">হোয়াটসঅ্যাপে অর্ডার</span>
-    </a>
-  );
-};
 export const BookDetails = () => {
   const { id } = useParams();
   const descriptionRef = useRef(null);
@@ -123,6 +76,11 @@ export const BookDetails = () => {
 
   // ─── Modal state ────────────────────────────────────────────
   const [showPdfModal, setShowPdfModal] = useState(false);
+  useEffect(() => {
+    if (book) {
+      trackViewItem(book);
+    }
+  }, [book]);
 
   // ─── Fetch Book Data ──────────────────────────────────────
   useEffect(() => {

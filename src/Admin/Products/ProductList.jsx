@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Plus, Edit, Trash2, Eye } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import api from '../../api/axios';
+import { pushToDataLayer } from '../../utils/gtm';
 
 const ProductList = () => {
     const [books, setBooks] = useState([]);
@@ -27,23 +28,25 @@ const ProductList = () => {
         fetchbooks();
     }, []);
 
-    const handleDelete = async (id) => {
-        const confirmDelete = window.confirm(
-            "Are you sure you want to delete this book?"
-        );
 
-        if (!confirmDelete) return;
+    const handleDelete = async (id) => {
+        if (!window.confirm("Are you sure?")) return;
 
         try {
+            const deletedBook = books.find((b) => b._id === id);
             await api.delete(`/books/${id}`);
+
+            pushToDataLayer('admin_delete_book', {
+                book_id: id,
+                book_title: deletedBook?.title,
+            });
+
             toast.success("Book deleted successfully!");
-            setBooks((prevBooks) => prevBooks.filter((book) => book._id !== id));
+            setBooks((prev) => prev.filter((b) => b._id !== id));
         } catch (error) {
-            console.error("Delete book error:", error);
-            toast.error(error.response?.data?.message || "Failed to delete book");
+            toast.error("Failed to delete book");
         }
     };
-
     return (
         <div className="w-full">
             {/* Header */}

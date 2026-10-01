@@ -63,33 +63,32 @@ const Footer = () => {
               </a>
             </div>
           </div>
-
           {/* ─── ডান দিক: বই প্রাপ্তিস্থান ও তথ্য ───────────────────── */}
-          <div className="bg-emerald-800/30 border border-emerald-700/40 rounded-xl p-3.5 text-xs space-y-1.5 self-center">
-            <h3 className="font-semibold text-amber-400 text-xs tracking-wider uppercase">
+          <div className="bg-emerald-800/30 border border-emerald-700/40 rounded-xl p-5 space-y-3 self-center w-full">
+            <h3 className="font-bold text-amber-400 text-sm tracking-wider uppercase">
               আমাদের বইগুলো প্রাপ্তিস্থান
             </h3>
 
-            <div className="font-bold text-white text-sm">
+            <div className="font-bold text-white text-lg">
               দাওয়া পাবলিকেশন
             </div>
 
-            <div className="flex items-start gap-2 text-emerald-200/90">
-              <FaMapMarkerAlt className="text-amber-400 mt-0.5 flex-shrink-0" size={12} />
+            <div className="flex items-start gap-2.5 text-emerald-100 text-sm leading-relaxed">
+              <FaMapMarkerAlt className="text-amber-400 mt-1 flex-shrink-0" size={16} />
               <span>২৮ নং দোকান, ১১ ইসলামি টাওয়ার, বাংলাবাজার, ঢাকা।</span>
             </div>
 
-            <div className="flex items-center justify-between flex-wrap gap-2 pt-0.5 border-t border-emerald-700/30">
-              <div className="flex items-center gap-1.5 text-emerald-200/90">
-                <FaPhoneAlt className="text-amber-400" size={11} />
-                <a href="tel:01810728222" className="hover:text-amber-400 transition-colors">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2 border-t border-emerald-700/40 text-sm">
+              <div className="flex items-center gap-2 text-emerald-100">
+                <FaPhoneAlt className="text-amber-400 flex-shrink-0" size={14} />
+                <a href="tel:01810728222" className="hover:text-amber-400 transition-colors font-medium">
                   ০১৮১০-৭২৮২২২
                 </a>
               </div>
 
-              <div className="flex items-center gap-1.5 text-emerald-200/90">
-                <FaEnvelope className="text-amber-400" size={11} />
-                <a href="mailto:dawahpublicationbd@gmail.com" className="hover:text-amber-400 transition-colors">
+              <div className="flex items-center gap-2 text-emerald-100">
+                <FaEnvelope className="text-amber-400 flex-shrink-0" size={14} />
+                <a href="mailto:dawahpublicationbd@gmail.com" className="hover:text-amber-400 transition-colors font-medium">
                   dawahpublicationbd@gmail.com
                 </a>
               </div>
