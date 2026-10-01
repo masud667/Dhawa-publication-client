@@ -73,15 +73,15 @@ const Footer = () => {
               দাওয়া পাবলিকেশন
             </div>
 
-            <div className="flex items-start gap-2.5 text-emerald-100 text-sm leading-relaxed">
+            <div className="flex items-start gap-2.5 text-emerald-100 text-sm leading-relaxed font-bold">
               <FaMapMarkerAlt className="text-amber-400 mt-1 flex-shrink-0" size={16} />
               <span>২৮ নং দোকান, ১১ ইসলামি টাওয়ার, বাংলাবাজার, ঢাকা।</span>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2 border-t border-emerald-700/40 text-sm">
-              <div className="flex items-center gap-2 text-emerald-100">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2 border-t border-emerald-700/40 text-sm font-bold">
+              <div className="flex items-center gap-2 text-emerald-100 font-bold">
                 <FaPhoneAlt className="text-amber-400 flex-shrink-0" size={14} />
-                <a href="tel:01810728222" className="hover:text-amber-400 transition-colors font-medium">
+                <a href="tel:01810728222" className="hover:text-amber-400 transition-colors  font-bold">
                   ০১৮১০-৭২৮২২২
                 </a>
               </div>
