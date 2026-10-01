@@ -53,7 +53,7 @@ const getEmbeddablePdfUrl = (url) => {
 
 // ─── WhatsApp Button Component ─────────────────────────────
 const WhatsAppContactButton = ({ book }) => {
-  const whatsappNumber = "8801710728222";
+  const whatsappNumber = "8801810728222";
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
   const bookTitle = book?.title || "বইটি";
   const bookPrice = book?.price || "মূল্য জানতে চাই";
